@@ -1,0 +1,17 @@
+from Utils.Piece import Piece
+class Rook(Piece):
+    def __init__(self, position,color):
+        super().__init__(position)
+        self.color= color
+        self.type = "Rook"
+        self.photo="Tutaj ścieżka do Wieży"
+
+    def rook_can_moves(self,board):
+        output = ((-1,0),(1,0),(0,-1),(0,1))
+        return self.create_moves(board)
+
+    def get_type(self):
+        return self.type
+
+    def get_identificator(self):
+        return self.color[0]+'R'
