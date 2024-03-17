@@ -4,11 +4,11 @@ class Queen(Piece):
         super().__init__(position)
         self.color= color
         self.type = "Queen"
-        self.photo="Tutaj ścieżka do Hetmana"
+        self.photo="Images/wQ.png" if color == "white" else "Images/bQ.png"
 
     def queen_can_move(self,board):
         moves,attack_moves=self.rook_can_moves(board)
-        #moves,attack_moves+=self.bishop_can_moves(board)
+        moves,attack_moves+=self.bishop_can_moves(board)
         return moves,attack_moves
 
     def get_type(self):

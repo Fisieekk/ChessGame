@@ -3,6 +3,7 @@ class Piece:
         self.position = position
         self.has_moved = False
         self.picture = None
+        self.last_move = None
 
     # Getters
     def get_position(self):
@@ -10,18 +11,16 @@ class Piece:
 
     def get_picture(self):
         return self.picture
-
-    # Setter
+    def get_last_move(self):
+        return self.last_move
     def move(self, new_position):
         self.position = new_position
         self.has_moved = True
 
-    def create_moves(self, board):
+    def create_moves(self, board,output):
         moves = []
         attack_moves = []
         x, y = self.position
-        output = []
-
         for move in output:
             new_x = x + move[0]
             new_y = y + move[1]

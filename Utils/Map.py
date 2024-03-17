@@ -7,6 +7,7 @@ from .Pieces.Rook import Rook
 
 
 class Map:
+    #Trzeba dodać zmienną przechowującą ostatni ruch. Potrzebna do en passant
     def __init__(self, width, height):
         self.curr_player = 'white'
         self.moves=[]

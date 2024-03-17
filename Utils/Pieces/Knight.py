@@ -4,14 +4,14 @@ class Knight(Piece):
         super().__init__(position)
         self.color= color
         self.type = "Knight"
-        self.photo="Tutaj ścieżka do Skoczka"
+        self.photo="Images/wN.png" if color == "white" else "Images/bN.png"
 
     def can_move(self,board):
         moves = []
         attack_moves = []
-
-        for i in (-2, -1, 1, 2):
-            for j in (-2, -1, 1, 2):
+        moves_comb=[-2,-1,1,2]
+        for i in moves_comb:
+            for j in moves_comb:
                 new_x = self.x + i
                 new_y = self.y + j
                 if abs(i) != abs(j) and new_x >= 0 and new_x < 8 and new_y >= 0 and new_y < 8:

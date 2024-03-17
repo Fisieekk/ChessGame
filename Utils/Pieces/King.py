@@ -4,7 +4,7 @@ class King(Piece):
         super().__init__(position)
         self.color= color
         self.type = "King"
-        self.photo="Tutaj ścieżka do Króla"
+        self.photo="images/wK.png" if color == "white" else "images/bK.png"
 
     def can_move(self,board):
         moves = []
@@ -24,6 +24,8 @@ class King(Piece):
 
         moves += castle_moves
         return moves, attack_moves
+    def can_castle(self,rook):
+        return rook is not None and rook.type == "Rook" and not rook.has_moved
     def castle(self,map):
         castle_moves = []
         left_rook = map[0][self.y]

@@ -4,7 +4,7 @@ class Pawn(Piece):
         super().__init__(position)
         self.color= color
         self.type = "Pawn"
-        self.photo="Tutaj ścieżka do Pionka"
+        self.photo="Images/wp.png" if color == "white" else "Images/bp.png"
 
     def can_move(self,board):
         # Ten ruch poprawie kiedy bede dodawał roszade

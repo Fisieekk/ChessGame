@@ -4,11 +4,11 @@ class Rook(Piece):
         super().__init__(position)
         self.color= color
         self.type = "Rook"
-        self.photo="Tutaj ścieżka do Wieży"
+        self.photo="images/wR.png" if color == "white" else "images/bR.png"
 
     def rook_can_moves(self,board):
         output = ((-1,0),(1,0),(0,-1),(0,1))
-        return self.create_moves(board)
+        return self.create_moves(board,output)
 
     def get_type(self):
         return self.type
