@@ -20,6 +20,7 @@ class Knight(Piece):
                     else:
                         if board.board_arr[new_x][new_y].color != self.color:
                             attack_moves.append([new_x, new_y])
+        return moves,attack_moves
     def get_type(self):
         return self.type
 

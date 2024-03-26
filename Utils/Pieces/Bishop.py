@@ -8,9 +8,13 @@ class Bishop(Piece):
         self.type = "Bishop"
         self.photo = "images/wB.png" if color == "white" else "images/bB.png"
 
-    def bishop_can_move(self, board):
+    def can_move(self, board):
+        return self.bishop_moves(self,board)
+
+    def bishop_moves(self,board):
         output = ((-1, -1), (1, 1), (1, -1), (-1, 1))
         return self.create_moves(board,output)
+
 
     def get_type(self):
         return self.type
