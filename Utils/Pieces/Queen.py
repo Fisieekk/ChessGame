@@ -16,4 +16,4 @@ class Queen(Piece):
         return self.type
 
     def get_identificator(self):
-        return self.color[0]+'R'
+        return self.color[0]+'Q'

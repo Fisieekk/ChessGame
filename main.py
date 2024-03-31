@@ -1,6 +1,12 @@
 import pygame
 import Utils.Map as mp
+# Added some features:
+#  not validated piece moving showing possible moves (TODO implement method to return possible moves, for now there are some random positions selected)
+#  move history
+#  I need to refactor main function because now it's not intuitive and messy, especially main loop
+#  TODO be careful about order (board[col][row])!
 
+# TODO maybe move to Map?
 WIDTH, HEIGHT = 800, 800
 ROW, COLUMN = 8, 8
 SIZE = WIDTH // ROW
@@ -8,7 +14,8 @@ IMAGES = {}
 # Define colors
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
-
+RED = (127, 0, 0, 128)
+GREEN = (0, 128, 0, 128)
 fps = 30
 
 
@@ -34,6 +41,21 @@ def draw_pieces(screen, board):
                 screen.blit(IMAGES[piece.get_identificator()], pygame.Rect(c * SIZE, r * SIZE, SIZE, SIZE))
 
 
+# draws all the possible moves and attack moves
+def draw_possible_moves(screen, moves, attack_moves):
+    for r, c in moves:
+        move_surface = pygame.Surface((SIZE, SIZE), pygame.SRCALPHA)
+        move_surface.fill(GREEN)
+        screen.blit(move_surface, (c * SIZE, r * SIZE))
+
+    for r, c in attack_moves:
+        attack_surface = pygame.Surface((SIZE, SIZE), pygame.SRCALPHA)
+        attack_surface.fill(RED)
+        screen.blit(attack_surface, (c * SIZE, r * SIZE))
+
+
+# def drag_piece(screen,board,new_x,new_y):
+
 def main():
     pygame.init()
     pygame.font.init()
@@ -41,22 +63,65 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     gb = mp.Map(8, 8)
     board = gb.board
+    history = []
+    captured_pieces=[]
 
     pygame.display.set_caption("Chess")
     timer = pygame.time.Clock()
     running = True
+    selected_piece = None
+    original_pos = None
+    mouse_down = False
+    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    fps_counter = 0
+
     while running:
         timer.tick(fps)
         draw_board(screen)
         draw_pieces(screen, board)
+        fps_counter += 1
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                row, col = x // SIZE, y // SIZE
+                if board[col][row]:
+                    selected_piece = board[col][row]
+                    original_pos = (col,row)
+                    mouse_down = True
+
+            #here is a place for move validation
+            if event.type == pygame.MOUSEBUTTONUP and selected_piece:
+                x, y = pygame.mouse.get_pos()
+                new_col, new_row = y // SIZE, x // SIZE
+                board[original_pos[0]][original_pos[1]] = None
+                if board[new_col][new_row]:
+                    captured_pieces.append(board[new_col][new_row].get_identificator())
+                board[new_col][new_row] = selected_piece
+                move_id = selected_piece.get_identificator()[1] + letters[new_row] + str(8 - new_col)
+                history.append(move_id)
+                selected_piece = None
+                mouse_down = False
+
+        if mouse_down and selected_piece:
+            x, y = pygame.mouse.get_pos()
+            screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))
+
+        if mouse_down:
+            draw_possible_moves(screen, [[0, 0], [1, 1], [2, 2], [3, 3]],
+                                [[4, 4], [5, 5], [6, 6], [7, 7]])  # TODO replace with real values
+
         pygame.display.flip()
+
+        # to not to get history printed too often
+        if fps_counter % 100 == 0:
+            print(history)
+            print(captured_pieces)
     pygame.quit()
 
 
-if __name__ == "__main__":  
+if __name__ == "__main__":
     main()

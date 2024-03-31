@@ -17,19 +17,19 @@ class Piece:
         self.position = new_position
         self.has_moved = True
 
-    def create_moves(self, board,output):
+    def create_moves(self, board, output):
         moves = []
         attack_moves = []
         x, y = self.position
         for move in output:
             new_x = x + move[0]
             new_y = y + move[1]
-            while 8 > new_x >= 0 and new_y < 8 and new_y >= 0 and board[new_y][new_x] is None:
+            while 8 > new_x >= 0 and 8 > new_y >= 0 and board[new_y][new_x] is None:
                 moves.append((new_x, new_y))
                 new_x += move[0]
                 new_y += move[1]
 
-            if 8 > new_x >= 0 and new_y < 8 and new_y >= 0 and board[new_y][new_x] is not None and \
+            if 8 > new_x >= 0 and 8 > new_y >= 0 and board[new_y][new_x] is not None and \
                     board[new_y][new_x].color != self.color:
                 attack_moves.append((new_x, new_y))
 
