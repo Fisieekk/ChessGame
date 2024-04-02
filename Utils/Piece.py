@@ -1,6 +1,7 @@
 class Piece:
     def __init__(self, position):
         self.position = position
+        self.x, self.y = position
         self.has_moved = False
         self.picture = None
         self.last_move = None

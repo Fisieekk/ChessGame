@@ -105,14 +105,16 @@ def main():
                 history.append(move_id)
                 selected_piece = None
                 mouse_down = False
-
+        
+        moves,attack_moves = None,None
+        if selected_piece:
+            moves,attack_moves = selected_piece.can_move(board)
         if mouse_down and selected_piece:
             x, y = pygame.mouse.get_pos()
             screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))
 
         if mouse_down:
-            draw_possible_moves(screen, [[0, 0], [1, 1], [2, 2], [3, 3]],
-                                [[4, 4], [5, 5], [6, 6], [7, 7]])  # TODO replace with real values
+            draw_possible_moves(screen, moves,attack_moves)  # TODO replace with real values
 
         pygame.display.flip()
 
