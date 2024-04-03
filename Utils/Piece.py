@@ -14,6 +14,11 @@ class Piece:
         return self.picture
     def get_last_move(self):
         return self.last_move
+    
+    def set_position(self, x, y):
+        self.position = (x, y)
+        self.x = x
+        self.y = y
     def move(self, new_position):
         self.position = new_position
         self.has_moved = True
@@ -23,15 +28,15 @@ class Piece:
         attack_moves = []
         x, y = self.position
         for move in output:
-            new_x = x + move[0]
-            new_y = y + move[1]
-            while 8 > new_x >= 0 and 8 > new_y >= 0 and board[new_y][new_x] is None:
-                moves.append((new_x, new_y))
-                new_x += move[0]
-                new_y += move[1]
+            new_x = x + move[1]
+            new_y = y + move[0]
+            while 8 > new_x >= 0 and 8 > new_y >= 0 and board.board[new_y][new_x] is None:
+                moves.append((new_y, new_x))
+                new_x += move[1]
+                new_y += move[0]
 
-            if 8 > new_x >= 0 and 8 > new_y >= 0 and board[new_y][new_x] is not None and \
-                    board[new_y][new_x].color != self.color:
-                attack_moves.append((new_x, new_y))
+            if 8 > new_x >= 0 and 8 > new_y >= 0 and board.board[new_y][new_x] is not None and \
+                    board.board[new_y][new_x].color != self.color:
+                attack_moves.append((new_y, new_x))
 
         return moves, attack_moves

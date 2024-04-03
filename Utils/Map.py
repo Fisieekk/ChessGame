@@ -37,6 +37,9 @@ class Map:
     def piece_moves(self, start, end):
         moves, attack_moves = start.can_move(self)
         print(moves)
+    
+    def last_move(self):
+        return None if not self.moves else self.moves[-1]
 
     def get_possible_attacks(self, color):
         possible_attacks = []

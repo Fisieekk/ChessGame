@@ -101,14 +101,15 @@ def main():
                 if board[new_col][new_row]:
                     captured_pieces.append(board[new_col][new_row].get_identificator())
                 board[new_col][new_row] = selected_piece
+                selected_piece.set_position(new_row,new_col)
                 move_id = selected_piece.get_identificator()[1] + letters[new_row] + str(8 - new_col)
                 history.append(move_id)
                 selected_piece = None
+                moves,attack_moves = None,None
                 mouse_down = False
-        
         moves,attack_moves = None,None
         if selected_piece:
-            moves,attack_moves = selected_piece.can_move(board)
+            moves,attack_moves = selected_piece.can_move(gb)
         if mouse_down and selected_piece:
             x, y = pygame.mouse.get_pos()
             screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))
@@ -119,9 +120,9 @@ def main():
         pygame.display.flip()
 
         # to not to get history printed too often
-        if fps_counter % 100 == 0:
-            print(history)
-            print(captured_pieces)
+        # if fps_counter % 100 == 0:
+        #     # print(history)
+        #     # print(captured_pieces)
     pygame.quit()
 
 

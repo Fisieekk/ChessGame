@@ -7,30 +7,33 @@ class Pawn(Piece):
         self.photo="Images/wp.png" if color == "white" else "Images/bp.png"
 
     def can_move(self,board):
-        # Ten ruch poprawie kiedy bede dodawał roszade
-        output = []
+        if self.color=="white":
+            poss_change=-1
+        else:
+            poss_change=1
         moves = []
         attack_moves = []
-        new_y = self.y + 1
-        if self.x<8 and self.x>0 and board[new_y][self.x] == None:
-            moves.append([self.x,new_y])
-            if self.last_move == None and board[new_y+1][self.x] == None:
-                moves.append([self.x,new_y+1])
-        new_y = self.y + 1
+        new_y = self.y + poss_change
+        if self.x<8 and self.x>0 and new_y<8 and new_y>0 and board.board[new_y][self.x] == None:
+            moves.append([new_y,self.x])
+            if self.last_move == None:
+                new_y += poss_change
+                if board.board[new_y+1][self.x] == None:
+                    moves.append([new_y,self.x])
+        new_y = self.y + poss_change
         for i in (-1,1):
             new_x = self.x + i
-            if new_x<8 and new_x>=0 and board[new_y][new_x] and board[new_y][new_x].color != self.color:
-                attack_moves.append([new_x,new_y])
-                attack_moves.append([new_x,new_y])
+            if new_x<8 and new_x>=0 and new_y>0 and new_y<8 and board.board[new_y][new_x] and board.board[new_y][new_x].color != self.color:
+                attack_moves.append([new_y,new_x])
         en_passant_moves = []
         for i in (-1, 1):
-            if self.x + i >= 0 and self.x + i < 8 and self.y:
-                possible_target = board[self.x + i][self.y]
+            if self.x + i >= 0 and self.x + i < 8 and self.y>0 and self.y<8:
+                possible_target = board.board[self.y][self.x + i]
                 if type(possible_target) == Pawn and self.color != possible_target.color:
                     last_move = board.last_move()
-                    if last_move is not None and last_move[2] == self.symbol and last_move[4][0] == self.x + i \
+                    if last_move is not None and last_move[2] == self.symbol and last_move[0][4] == self.x + i \
                             and abs(last_move[4][1] - last_move[3][1]) == 2:
-                        en_passant_moves.append([self.x + i, self.y])
+                        en_passant_moves.append([self.y, self.x + i])
         attack_moves+=en_passant_moves
         return moves, attack_moves
     def get_type(self):

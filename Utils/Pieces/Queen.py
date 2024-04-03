@@ -1,4 +1,6 @@
 from Utils.Piece import Piece
+from .Bishop import Bishop
+from .Rook import Rook
 class Queen(Piece):
     def __init__(self, position,color):
         super().__init__(position)
@@ -7,9 +9,12 @@ class Queen(Piece):
         self.photo="Images/wQ.png" if color == "white" else "Images/bQ.png"
 
     def can_move(self,board):
-        moves,attack_moves=self.rook_can_moves(board)
-        moves+=self.bishop_can_moves(board)[0]
-        attack_moves+=self.bishop_can_moves(board)[1]
+        bishop = Bishop(self.position,self.color)
+        rook = Rook(self.position,self.color)
+        moves,attack_moves=rook.can_move(board)
+        print(moves,attack_moves)
+        moves+=bishop.can_move(board)[0]
+        attack_moves+=bishop.can_move(board)[1]
         return moves,attack_moves
 
     def get_type(self):
