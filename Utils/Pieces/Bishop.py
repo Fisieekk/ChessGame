@@ -9,12 +9,10 @@ class Bishop(Piece):
         self.photo = "images/wB.png" if color == "white" else "images/bB.png"
 
     def can_move(self, board):
-        print(self.position)
         return self.bishop_moves(board)
 
     def bishop_moves(self,board):
         output = ((-1, -1), (1, 1), (1, -1), (-1, 1))
-        print(self.create_moves(board,output))
         return self.create_moves(board,output)
 
 

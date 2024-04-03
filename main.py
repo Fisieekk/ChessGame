@@ -103,7 +103,10 @@ def main():
                 board[new_col][new_row] = selected_piece
                 selected_piece.set_position(new_row,new_col)
                 move_id = selected_piece.get_identificator()[1] + letters[new_row] + str(8 - new_col)
-                history.append(move_id)
+                print(original_pos, new_col, new_row, move_id)
+                if(original_pos[0] != new_col or original_pos[1] != new_row):
+                    history.append(move_id)
+                    selected_piece.last_move = history[-1] if history else None
                 selected_piece = None
                 moves,attack_moves = None,None
                 mouse_down = False

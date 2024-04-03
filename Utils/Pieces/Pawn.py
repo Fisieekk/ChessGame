@@ -7,6 +7,7 @@ class Pawn(Piece):
         self.photo="Images/wp.png" if color == "white" else "Images/bp.png"
 
     def can_move(self,board):
+        print(self.last_move)
         if self.color=="white":
             poss_change=-1
         else:
