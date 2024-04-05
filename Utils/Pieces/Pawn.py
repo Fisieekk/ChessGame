@@ -13,13 +13,11 @@ class Pawn(Piece):
             poss_change=1
         moves = []
         attack_moves = []
-        print(self.y,poss_change)
         new_y = self.y + poss_change
         if self.x<8 and self.x>=0 and new_y<8 and new_y>=0 and board.board[new_y][self.x] == None:
             moves.append([new_y,self.x])
             if self.last_move == None:
                 new_y += poss_change
-                print(new_y)
                 if board.board[new_y][self.x] == None:
                     moves.append([new_y,self.x])
         new_y = self.y + poss_change
