@@ -15,7 +15,7 @@ class King(Piece):
             for j in (-1, 0, 1):
                 new_x = self.x + i
                 new_y = self.y + j
-                if (i != 0 or j != 0) and new_x >= 0 and new_x < 8 and new_y >= 0 and new_y < 8:
+                if (i != 0 or j != 0) and 0 <= new_x < 8 and 0 <= new_y < 8:
                     if board.board[new_y][new_x] is None:
                         moves.append([new_y,new_x])
                     else:

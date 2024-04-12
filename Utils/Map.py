@@ -39,17 +39,18 @@ class Map:
 
     def move(self, start, end):
         piece, self.board[start[0]][start[1]] = self.board[start[0]][start[1]], None
-        if type(piece)==King:
-            if piece.color=="white":
-                self.white_king_position=[end[0],end[1]]
+        if type(piece) == King:
+            if piece.color == "white":
+                self.white_king_position = [end[0], end[1]]
             else:
-                self.black_king_position=[end[0],end[1]]
+                self.black_king_position = [end[0], end[1]]
         piece.move(end)
         piece.last_move = self.turn
         self.board[end[0]][end[1]] = piece
         self.history.append((piece, self.turn, piece.color, piece.type, start, end))
         self.last_move = (start, end)
         self.turn += 1
+        self.curr_player = 'white' if self.curr_player == 'black' else 'black'
 
     def all_possible_attacks(self, color):
         possible_attacks = []
@@ -60,62 +61,42 @@ class Map:
                     possible_attacks += attack_moves
         return possible_attacks
 
-    def preventer(self,moves,attack_moves,piece):
-        old_y,old_x=piece.position
-        self.board[old_y][old_x]=None
-        color=piece.color
-        moves_to_remove=[]
+    def preventer(self, moves, attack_moves, piece):
+        old_y, old_x = piece.position
+        self.board[old_y][old_x] = None
+        color = piece.color
+        moves_to_remove = []
         for move in moves:
-            new_y,new_x=move
-            self.board[new_y][new_x]=piece
-            if color=="white":
+            new_y, new_x = move
+            self.board[new_y][new_x] = piece
+            if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
             else:
                 if self.black_king_position in self.all_possible_attacks("white"):
                     moves_to_remove.append(move)
-            self.board[new_y][new_x]=None
+            self.board[new_y][new_x] = None
         for move in attack_moves:
-            new_y,new_x=move
-            temp,self.board[new_y][new_x]=self.board[new_y][new_x],piece
-            if color=="white":
+            new_y, new_x = move
+            temp, self.board[new_y][new_x] = self.board[new_y][new_x], piece
+            if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
             else:
                 if self.black_king_position in self.all_possible_attacks("white"):
                     moves_to_remove.append(move)
-            self.board[new_y][new_x]=temp
-            self.board[old_y][old_x]=piece
+            self.board[new_y][new_x] = temp
+            self.board[old_y][old_x] = piece
         for move in moves_to_remove:
-            moves.remove(move)
-        self.board[old_y][old_x]=piece
-        return moves,attack_moves
+            if move in moves:
+                moves.remove(move)
+        self.board[old_y][old_x] = piece
+        return moves, attack_moves
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def check(self,attack_moves):
+        king_position = self.white_king_position if self.curr_player=='white' else self.black_king_position
+        #if king_position in attack_moves:
 
     # def preventer(self,start,end):
     #     old_y,old_x=start
@@ -133,26 +114,9 @@ class Map:
     #     self.board[old_y][old_x]=piece
     #     return True
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     # def piece_moves(self, start, end):
     #     moves, attack_moves = start.can_move(self)
-    
+
     # def last_move(self):
     #     return None if not self.moves else self.moves[-1]
 
@@ -234,4 +198,3 @@ class Map:
     #                         else:
     #                             self.check_black = True
     #                         return
-
