@@ -37,18 +37,42 @@ class Map:
              King((7, 4), 'white'), Bishop((7, 5), 'white'), Knight((7, 6), 'white'), Rook((7, 7), 'white')]
         ]
 
+    
+
+
+
+
     def move(self, start, end):
         piece, self.board[start[0]][start[1]] = self.board[start[0]][start[1]], None
         if type(piece)==King:
             if piece.color=="white":
                 self.white_king_position=[end[0],end[1]]
+                if end==(7,6):
+                    self.board[7][7].move((7,5))
+                    self.board[7][5]=self.board[7][7]
+                    self.board[7][7]=None
+                elif end==(7,2):
+                    self.board[7][0].move((7,3))
+                    self.board[7][3]=self.board[7][0]
+                    self.board[7][0]=None
             else:
                 self.black_king_position=[end[0],end[1]]
+                if end==(0,6):
+                    self.board[0][7].move((0,5))
+                    self.board[0][5]=self.board[0][7]
+                    self.board[0][7]=None
+                elif end==(0,2):
+                    self.board[0][0].move((0,3))
+                    self.board[0][3]=self.board[0][0]
+                    self.board[0][0]=None
         piece.move(end)
         piece.last_move = self.turn
         self.board[end[0]][end[1]] = piece
         self.history.append((piece, self.turn, piece.color, piece.type, start, end))
         self.last_move = (start, end)
+        if type(piece)==Pawn and (end[0] == 0 or end[0] == 7):
+            self.promotion = piece
+            promotionn(self, piece, end)
         self.turn += 1
 
     def all_possible_attacks(self, color):
@@ -111,21 +135,33 @@ class Map:
         self.board[old_y][old_x]=piece
         return moves,attack_moves
 
+    def castle(self,moves,attack_moves,piece):
+        if piece.last_move is not None:
+            return moves,attack_moves
+        if piece.color=="white":
+            if self.board[7][7].last_move is None:
+                if self.board[7][6] is None and self.board[7][5] is None:
+                        moves.append((7,6))
+            if self.board[7][0].last_move is None:
+                if self.board[7][1] is None and self.board[7][2] is None and self.board[7][3] is None:
+                        moves.append((7,2))
+        else:
+            if self.board[0][7].last_move is None:
+                if self.board[0][6] is None and self.board[0][5] is None:
+                        moves.append((0,6))
+            if self.board[0][0].last_move is None:
+                if self.board[0][1] is None and self.board[0][2] is None and self.board[0][3] is None:
+                        moves.append((0,2))
+
+        return moves,attack_moves
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+def promotionn(self,piece,position):
+    #placeholder
+    print("promotion")
+    pass
 
 
 

@@ -1,5 +1,6 @@
 import pygame
 import Utils.Map as mp
+from Utils.Pieces.King import King
 # Added some features:
 #  not validated piece moving showing possible moves (TODO implement method to return possible moves, for now there are some random positions selected)
 #  move history
@@ -115,7 +116,9 @@ def main():
         moves,attack_moves = None,None
         if selected_piece:
             moves,attack_moves = selected_piece.can_move(gb)
-            moves,attack_moves = gb.preventer(moves,attack_moves,selected_piece)  
+            moves,attack_moves = gb.preventer(moves,attack_moves,selected_piece)
+            if type(selected_piece)==King:
+                moves,attack_moves = gb.castle(moves,attack_moves,selected_piece)
         if mouse_down and selected_piece:
             x, y = pygame.mouse.get_pos()
             screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))

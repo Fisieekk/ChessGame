@@ -12,7 +12,6 @@ class Queen(Piece):
         bishop = Bishop(self.position,self.color)
         rook = Rook(self.position,self.color)
         moves,attack_moves=rook.can_move(board)
-        print(moves,attack_moves)
         moves+=bishop.can_move(board)[0]
         attack_moves+=bishop.can_move(board)[1]
         return moves,attack_moves
