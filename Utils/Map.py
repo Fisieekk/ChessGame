@@ -19,6 +19,8 @@ class Map:
         self.black_king_position = [0, 4]
         self.check_white = False
         self.check_black = False
+        self.white_king_moved = False
+        self.black_king_moved = False
         self.winner = None
         self.width = width
         self.height = height
@@ -40,7 +42,7 @@ class Map:
     def move(self, start, end):
         piece, self.board[start[0]][start[1]] = self.board[start[0]][start[1]], None
         if type(piece) == King:
-            if piece.color == "white":
+            if piece.color == "white" and not self.white_king_moved:
                 self.white_king_position = [end[0], end[1]]
                 if end == (7, 6):
                     self.board[7][7].move((7, 5))
@@ -50,7 +52,8 @@ class Map:
                     self.board[7][0].move((7, 3))
                     self.board[7][3] = self.board[7][0]
                     self.board[7][0] = None
-            else:
+
+            elif piece.color == "black" and not self.black_king_moved:
                 self.black_king_position = [end[0], end[1]]
                 if end == (0, 6):
                     self.board[0][7].move((0, 5))
@@ -60,6 +63,10 @@ class Map:
                     self.board[0][0].move((0, 3))
                     self.board[0][3] = self.board[0][0]
                     self.board[0][0] = None
+            if piece.color== 'white':
+                self.white_king_moved = True
+            if piece.color=='black':
+                self.black_king_moved = True
         piece.move(end)
         piece.last_move = self.turn
         self.board[end[0]][end[1]] = piece
@@ -95,9 +102,13 @@ class Map:
             if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
+                    self.check_white = True
+            elif self.black_king_position in self.all_possible_attacks("white"):
+                moves_to_remove.append(move)
+                self.check_black = True
             else:
-                if self.black_king_position in self.all_possible_attacks("white"):
-                    moves_to_remove.append(move)
+                self.check_white = False
+                self.check_black = False
             self.board[new_y][new_x] = None
             if type(piece) == King:
                 if color == "white":
@@ -126,7 +137,8 @@ class Map:
                 else:
                     self.black_king_position = [old_y, old_x]
         for move in moves_to_remove:
-            moves.remove(move)
+            if move in moves:
+                moves.remove(move)
         self.board[old_y][old_x] = piece
         return moves, attack_moves
 
@@ -152,7 +164,7 @@ class Map:
 
 
 def promotionn(self, piece, position):
-    #placeholder
+    # placeholder
     print("promotion")
     pass
 
