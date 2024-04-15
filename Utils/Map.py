@@ -68,6 +68,11 @@ class Map:
         for move in moves:
             new_y,new_x=move
             self.board[new_y][new_x]=piece
+            if type(piece)==King:
+                if color=="white":
+                    self.white_king_position=[new_y,new_x]
+                else:
+                    self.black_king_position=[new_y,new_x]
             if color=="white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
@@ -75,9 +80,19 @@ class Map:
                 if self.black_king_position in self.all_possible_attacks("white"):
                     moves_to_remove.append(move)
             self.board[new_y][new_x]=None
+            if type(piece)==King:
+                if color=="white":
+                    self.white_king_position=[old_y,old_x]
+                else:
+                    self.black_king_position=[old_y,old_x]
         for move in attack_moves:
             new_y,new_x=move
             temp,self.board[new_y][new_x]=self.board[new_y][new_x],piece
+            if type(piece)==King:
+                if color=="white":
+                    self.white_king_position=[new_y,new_x]
+                else:
+                    self.black_king_position=[new_y,new_x]
             if color=="white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
@@ -86,6 +101,11 @@ class Map:
                     moves_to_remove.append(move)
             self.board[new_y][new_x]=temp
             self.board[old_y][old_x]=piece
+            if type(piece)==King:
+                if color=="white":
+                    self.white_king_position=[old_y,old_x]
+                else:
+                    self.black_king_position=[old_y,old_x]
         for move in moves_to_remove:
             moves.remove(move)
         self.board[old_y][old_x]=piece
