@@ -17,6 +17,7 @@ IMAGES = {}
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
 RED = (127, 0, 0, 128)
+DARK_RED = (255, 0, 0, 128)
 GREEN = (0, 128, 0, 128)
 fps = 30
 
@@ -57,23 +58,19 @@ def draw_possible_moves(screen, moves, attack_moves):
 
 
 def show_checks(screen, gb):
+    r, c = None, None
     if gb.check_white:
-        c, r = gb.white_king_position
-        move_surface = pygame.Surface((SIZE, SIZE), pygame.SRCALPHA)
-        move_surface.fill(RED)
-        screen.blit(move_surface, (c * SIZE, r * SIZE))
+        r, c = gb.white_king_position
     elif gb.check_black:
-        c, r = gb.black_king_position
-        move_surface = pygame.Surface((SIZE, SIZE), pygame.SRCALPHA)
-        move_surface.fill(RED)
-        screen.blit(move_surface, (c * SIZE, r * SIZE))
+        r, c = gb.black_king_position
     else:
         return
+    move_surface = pygame.Surface((SIZE, SIZE), pygame.SRCALPHA)
+    move_surface.fill(DARK_RED)
+    screen.blit(move_surface, (c * SIZE, r * SIZE))
 
 
-
-# def drag_piece(screen,board,new_x,new_y):
-
+# TODO refactor main function
 def main():
     pygame.init()
     pygame.font.init()
@@ -99,7 +96,6 @@ def main():
         draw_pieces(screen, board)
         fps_counter += 1
 
-        show_checks(screen, gb)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -112,7 +108,7 @@ def main():
                     original_pos = (col, row)
                     mouse_down = True
 
-            #here is a place for move validation
+            # here is a place for move validation
             if event.type == pygame.MOUSEBUTTONUP and selected_piece:
                 x, y = pygame.mouse.get_pos()
                 new_col, new_row = y // SIZE, x // SIZE
@@ -130,6 +126,7 @@ def main():
                         history.append(move_id)
                         selected_piece.last_move = history[-1] if history else None
                         gb.curr_player = 'white' if gb.curr_player == 'black' else 'black'
+                        gb.check_white = gb.check_black = False
                 selected_piece = None
                 moves, attack_moves = None, None
                 mouse_down = False
@@ -145,6 +142,8 @@ def main():
 
         if mouse_down:
             draw_possible_moves(screen, moves, attack_moves)
+            if gb.check_white or gb.check_black:
+                show_checks(screen, gb)
         pygame.display.flip()
 
         # to not to get history printed too often
