@@ -86,6 +86,16 @@ class Map:
                     possible_attacks += attack_moves
         return possible_attacks
 
+    def all_possible_moves(self, color):
+        possible_moves = []
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j] is not None and self.board[i][j].color == color:
+                    moves, attack_moves = self.board[i][j].can_move(self)
+                    possible_moves += attack_moves
+                    possible_moves+=moves
+        return possible_moves
+
     def preventer(self, moves, attack_moves, piece):
         old_y, old_x = piece.position
         self.board[old_y][old_x] = None
@@ -162,6 +172,16 @@ class Map:
 
         return moves, attack_moves
 
+    def calculate_mate(self,color):
+        king_checked = self.check_white if color == 'white' else self.check_black
+        if not king_checked:
+            return False
+        friendly_moves=self.all_possible_moves(color)
+        #enemy_color='white' if color=='black' else 'black'
+
+        if len(friendly_moves) ==0:
+            return True
+        return False
 
 def promotionn(self, piece, position):
     # placeholder
