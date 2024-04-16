@@ -3,9 +3,7 @@ import Utils.Map as mp
 from Utils.Pieces.King import King
 
 # Added some features:
-#  not validated piece moving showing possible moves (TODO implement method to return possible moves, for now there are some random positions selected)
-#  move history
-#  I need to refactor main function because now it's not intuitive and messy, especially main loop
+#  TODO need to refactor main file because now it's not intuitive and messy, especially main loop
 #  TODO be careful about order (board[col][row])!
 
 # TODO maybe move to Map?
@@ -81,6 +79,7 @@ def show_message(screen, color, message):
 
 # TODO refactor main function
 def main():
+    global attack_moves, moves
     pygame.init()
     pygame.font.init()
     load_images()
@@ -107,9 +106,12 @@ def main():
         fps_counter += 1
 
         for event in pygame.event.get():
+            # quit
             if event.type == pygame.QUIT:
                 running = False
+            # if game not ended
             if not mate:
+                # click on piece
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
                     row, col = x // SIZE, y // SIZE
@@ -118,38 +120,43 @@ def main():
                         original_pos = (col, row)
                         mouse_down = True
 
-                # here is a place for move validation
+                # if we have selected piece we can make a move
                 if event.type == pygame.MOUSEBUTTONUP and selected_piece:
                     x, y = pygame.mouse.get_pos()
                     new_col, new_row = y // SIZE, x // SIZE
-                    # board[original_pos[0]][original_pos[1]] = None
 
                     if board[new_col][new_row]:
                         captured_pieces.append(board[new_col][new_row].get_identificator())
-                    # board[new_col][new_row] = selected_piece
-                    # selected_piece.set_position(new_row,new_col)
+                        gb.evaluate_captured_piece(board[new_col][new_row])
+                        print('Captured value: ')
+                        print('White: ', gb.white_captured_value, ' Black: ', gb.black_captured_value)
+
                     if [new_col, new_row] in moves or [new_col, new_row] in attack_moves:
-                        if (original_pos[0] != new_col or original_pos[1] != new_row):
-                            # if(gb.preventer(original_pos,(new_col,new_row))):
+                        if original_pos[0] != new_col or original_pos[1] != new_row:
                             gb.move(original_pos, (new_col, new_row))
                             move_id = selected_piece.get_identificator()[1] + letters[new_row] + str(8 - new_col)
                             history.append(move_id)
                             selected_piece.last_move = history[-1] if history else None
                             gb.curr_player = 'white' if gb.curr_player == 'black' else 'black'
                             gb.check_white = gb.check_black = False
+
                     selected_piece = None
                     moves, attack_moves = None, None
                     mouse_down = False
+                # calculate mate TODO not working yet
                 mate = gb.calculate_mate(gb.curr_player)
-            else: # if mate==true
+
+            else:
                 show_message(screen, 'white' if gb.curr_player == 'black' else 'black', "")
 
         moves, attack_moves = None, None
+        # generate possible moves for selected piece depending on type
         if selected_piece:
             moves, attack_moves = selected_piece.can_move(gb)
             moves, attack_moves = gb.preventer(moves, attack_moves, selected_piece)
             if type(selected_piece) == King:
                 moves, attack_moves = gb.castle(moves, attack_moves, selected_piece)
+        # dragging piece
         if mouse_down and selected_piece:
             x, y = pygame.mouse.get_pos()
             screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))
@@ -159,13 +166,7 @@ def main():
             if gb.check_white or gb.check_black:
                 show_checks(screen, gb)
 
-
         pygame.display.flip()
-
-        # to not to get history printed too often
-        # if fps_counter % 100 == 0:
-        #     # print(history)
-        #     # print(captured_pieces)
     pygame.quit()
 
 

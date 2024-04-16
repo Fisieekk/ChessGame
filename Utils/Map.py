@@ -14,7 +14,7 @@ class Map:
         self.history = []
         self.last_move = None
         self.turn = 1
-        self.promotion = None
+        self.promotion_occurs = None
         self.white_king_position = [7, 4]
         self.black_king_position = [0, 4]
         self.check_white = False
@@ -24,6 +24,9 @@ class Map:
         self.winner = None
         self.width = width
         self.height = height
+        self.white_captured_value = 0
+        self.black_captured_value = 0
+        self.weights = {'P': 1, 'B': 3, 'N': 3, 'R': 5, 'Q': 9}
         self.board = [
             [Rook((0, 0), 'black'), Knight((0, 1), 'black'), Bishop((0, 2), 'black'), Queen((0, 3), 'black'),
              King((0, 4), 'black'), Bishop((0, 5), 'black'), Knight((0, 6), 'black'), Rook((0, 7), 'black')],
@@ -63,9 +66,9 @@ class Map:
                     self.board[0][0].move((0, 3))
                     self.board[0][3] = self.board[0][0]
                     self.board[0][0] = None
-            if piece.color== 'white':
+            if piece.color == 'white':
                 self.white_king_moved = True
-            if piece.color=='black':
+            if piece.color == 'black':
                 self.black_king_moved = True
         piece.move(end)
         piece.last_move = self.turn
@@ -73,8 +76,8 @@ class Map:
         self.history.append((piece, self.turn, piece.color, piece.type, start, end))
         self.last_move = (start, end)
         if type(piece) == Pawn and (end[0] == 0 or end[0] == 7):
-            self.promotion = piece
-            promotionn(self, piece, end)
+            self.promotion_occurs = piece
+            self.promotion(piece,end)
         self.turn += 1
 
     def all_possible_attacks(self, color):
@@ -93,7 +96,7 @@ class Map:
                 if self.board[i][j] is not None and self.board[i][j].color == color:
                     moves, attack_moves = self.board[i][j].can_move(self)
                     possible_moves += attack_moves
-                    possible_moves+=moves
+                    possible_moves += moves
         return possible_moves
 
     def preventer(self, moves, attack_moves, piece):
@@ -178,21 +181,27 @@ class Map:
 
         return moves, attack_moves
 
-    def calculate_mate(self,color):
+    def calculate_mate(self, color):
         king_checked = self.check_white if color == 'white' else self.check_black
         if not king_checked:
             return False
-        friendly_moves=self.all_possible_moves(color)
-        #enemy_color='white' if color=='black' else 'black'
+        friendly_moves = self.all_possible_moves(color)
+        # enemy_color='white' if color=='black' else 'black'
 
-        if len(friendly_moves) ==0:
+        if len(friendly_moves) == 0:
             return True
         return False
 
-def promotionn(self, piece, position):
-    # placeholder
-    print("promotion")
-    pass
+    def promotion(self, piece, position):
+        # placeholder
+        print("promotion")
+        pass
+
+    def evaluate_captured_piece(self, captured_piece):
+        if captured_piece.color == 'white':
+            self.black_captured_value += self.weights[captured_piece.get_identificator()[1]]
+        else:
+            self.white_captured_value += self.weights[captured_piece.get_identificator()[1]]
 
     # def preventer(self,start,end):
     #     old_y,old_x=start
