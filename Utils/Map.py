@@ -158,19 +158,23 @@ class Map:
         if piece.last_move is not None:
             return moves, attack_moves
         if piece.color == "white":
-            if self.board[7][7].last_move is None:
-                if self.board[7][6] is None and self.board[7][5] is None:
-                    moves.append((7, 6))
-            if self.board[7][0].last_move is None:
-                if self.board[7][1] is None and self.board[7][2] is None and self.board[7][3] is None:
-                    moves.append((7, 2))
+            if self.board[7][7] is not None:
+                if self.board[7][7].last_move is None:
+                    if self.board[7][6] is None and self.board[7][5] is None:
+                        moves.append((7, 6))
+            if self.board[7][0] is not None:
+                if self.board[7][0].last_move is None:
+                    if self.board[7][1] is None and self.board[7][2] is None and self.board[7][3] is None:
+                        moves.append((7, 2))
         else:
-            if self.board[0][7].last_move is None:
-                if self.board[0][6] is None and self.board[0][5] is None:
-                    moves.append((0, 6))
-            if self.board[0][0].last_move is None:
-                if self.board[0][1] is None and self.board[0][2] is None and self.board[0][3] is None:
-                    moves.append((0, 2))
+            if self.board[0][7] is not None:
+                if self.board[0][7].last_move is None:
+                    if self.board[0][6] is None and self.board[0][5] is None:
+                        moves.append((0, 6))
+            if self.board[0][0] is not None:
+                if self.board[0][0].last_move is None:
+                    if self.board[0][1] is None and self.board[0][2] is None and self.board[0][3] is None:
+                        moves.append((0, 2))
 
         return moves, attack_moves
 
