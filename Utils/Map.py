@@ -149,6 +149,8 @@ class Map:
         for move in moves_to_remove:
             if move in moves:
                 moves.remove(move)
+            elif move in attack_moves:
+                attack_moves.remove(move)
         self.board[old_y][old_x] = piece
         return moves, attack_moves
 

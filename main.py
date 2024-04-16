@@ -140,24 +140,26 @@ def main():
                     selected_piece = None
                     moves, attack_moves = None, None
                     mouse_down = False
-                moves, attack_moves = None, None
-                if selected_piece:
-                    moves, attack_moves = selected_piece.can_move(gb)
-                    moves, attack_moves = gb.preventer(moves, attack_moves, selected_piece)
-                    if type(selected_piece) == King:
-                        moves, attack_moves = gb.castle(moves, attack_moves, selected_piece)
-                if mouse_down and selected_piece:
-                    x, y = pygame.mouse.get_pos()
-                    screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))
-
-                if mouse_down:
-                    draw_possible_moves(screen, moves, attack_moves)
-                    if gb.check_white or gb.check_black:
-                        show_checks(screen, gb)
-
                 mate = gb.calculate_mate(gb.curr_player)
             else: # if mate==true
                 show_message(screen, 'white' if gb.curr_player == 'black' else 'black', "")
+
+        moves, attack_moves = None, None
+        if selected_piece:
+            moves, attack_moves = selected_piece.can_move(gb)
+            moves, attack_moves = gb.preventer(moves, attack_moves, selected_piece)
+            if type(selected_piece) == King:
+                moves, attack_moves = gb.castle(moves, attack_moves, selected_piece)
+        if mouse_down and selected_piece:
+            x, y = pygame.mouse.get_pos()
+            screen.blit(IMAGES[selected_piece.get_identificator()], (x - SIZE // 2, y - SIZE // 2))
+
+        if mouse_down:
+            draw_possible_moves(screen, moves, attack_moves)
+            if gb.check_white or gb.check_black:
+                show_checks(screen, gb)
+
+
         pygame.display.flip()
 
         # to not to get history printed too often
