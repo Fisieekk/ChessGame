@@ -14,7 +14,7 @@ class Map:
         self.history = []
         self.last_move = None
         self.turn = 1
-        self.promotion_occurs = None
+        self.promoting_piece = None
         self.white_king_position = [7, 4]
         self.black_king_position = [0, 4]
         self.check_white = False
@@ -76,7 +76,7 @@ class Map:
         self.history.append((piece, self.turn, piece.color, piece.type, start, end))
         self.last_move = (start, end)
         if type(piece) == Pawn and (end[0] == 0 or end[0] == 7):
-            self.promotion_occurs = piece
+            self.promoting_piece = piece
             self.promotion(piece,end)
         self.turn += 1
 
@@ -198,6 +198,9 @@ class Map:
         pass
 
     def evaluate_captured_piece(self, captured_piece):
+        #strange check, but once happened
+        if captured_piece.get_identificator()[-1]=='K':
+            return
         if captured_piece.color == 'white':
             self.black_captured_value += self.weights[captured_piece.get_identificator()[1]]
         else:

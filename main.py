@@ -2,13 +2,10 @@ import pygame
 import Utils.Map as mp
 from Utils.Pieces.King import King
 
-# Added some features:
-#  TODO need to refactor main file because now it's not intuitive and messy, especially main loop
-#  TODO be careful about order (board[col][row])!
-
-# TODO maybe move to Map?
+# TODO REFACTOR MAIN (I WILL DO THAT BUT MOST PROBABLY TOMORROW OR LATER)
 WIDTH, HEIGHT = 800, 800
 ROW, COLUMN = 8, 8
+WINDOW_WIDTH, WINDOW_HEIGHT = 1000, 1500
 SIZE = WIDTH // ROW
 IMAGES = {}
 # Define colors
@@ -18,6 +15,7 @@ RED = (127, 0, 0, 128)
 DARK_RED = (255, 0, 0, 128)
 GREEN = (0, 128, 0, 128)
 BLACK = (0, 0, 0, 255)
+GREY = (200, 200, 200, 128)
 fps = 30
 
 
@@ -77,19 +75,31 @@ def show_message(screen, color, message):
     screen.blit(text, text_rect)
 
 
+# gets screen and pawn to be promoted
+# returns new piece to be placed on board
+# TODO complete this function
+def show_promotion_window(screen, position):
+    r, c = position
+    color, positions = ('w', [7, 6, 5, 4]) if r == 7 else ('b', [0, 1, 2, 3])
+    rectangles = [pygame.Rect(c * SIZE, r * SIZE, SIZE, SIZE) for r in positions]
+    identifiers = [color + x for x in ['Q', 'R', 'B', 'N']]
+    for rectangle, id in zip(rectangles, identifiers):
+        screen.blit(IMAGES[id], rectangle)
+    return rectangles
+
 # TODO refactor main function
 def main():
     global attack_moves, moves
     pygame.init()
     pygame.font.init()
     load_images()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.NOFRAME)
     gb = mp.Map(8, 8)
     board = gb.board
     history = []
     captured_pieces = []
 
-    pygame.display.set_caption("Chess")
+   # pygame.display.set_caption("Chess")
     timer = pygame.time.Clock()
     running = True
     selected_piece = None
@@ -104,48 +114,54 @@ def main():
         draw_board(screen)
         draw_pieces(screen, board)
         fps_counter += 1
-
         for event in pygame.event.get():
             # quit
             if event.type == pygame.QUIT:
                 running = False
+
             # if game not ended
-            if not mate:
-                # click on piece
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = pygame.mouse.get_pos()
-                    row, col = x // SIZE, y // SIZE
-                    if board[col][row] and board[col][row].color == gb.curr_player:
-                        selected_piece = board[col][row]
-                        original_pos = (col, row)
-                        mouse_down = True
+            elif not mate:
+                if not gb.promoting_piece:
+                    # click on piece
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        x, y = pygame.mouse.get_pos()
+                        row, col = x // SIZE, y // SIZE
+                        if board[col][row] and board[col][row].color == gb.curr_player:
+                            selected_piece = board[col][row]
+                            original_pos = (col, row)
+                            mouse_down = True
 
-                # if we have selected piece we can make a move
-                if event.type == pygame.MOUSEBUTTONUP and selected_piece:
-                    x, y = pygame.mouse.get_pos()
-                    new_col, new_row = y // SIZE, x // SIZE
+                    # if we have selected piece we can make a move
+                    if event.type == pygame.MOUSEBUTTONUP and selected_piece:
+                        x, y = pygame.mouse.get_pos()
+                        new_col, new_row = y // SIZE, x // SIZE
+                        if [new_col, new_row] in moves or [new_col, new_row] in attack_moves:
+                            if original_pos[0] != new_col or original_pos[1] != new_row:
+                                # only if new_pos contains other piece we are evaluating material, and adding to history
+                                if board[new_col][new_row]:
+                                    captured_pieces.append(board[new_col][new_row].get_identificator())
+                                    gb.evaluate_captured_piece(board[new_col][new_row])
+                                    print('Captured value: ')
+                                    print('White: ', gb.white_captured_value, ' Black: ', gb.black_captured_value)
+                                    move_id = selected_piece.get_identificator()[1] + letters[new_row] + str(8 - new_col)
+                                    history.append(move_id)
+                                    selected_piece.last_move = history[-1] if history else None
 
-                    if board[new_col][new_row]:
-                        captured_pieces.append(board[new_col][new_row].get_identificator())
-                        gb.evaluate_captured_piece(board[new_col][new_row])
-                        print('Captured value: ')
-                        print('White: ', gb.white_captured_value, ' Black: ', gb.black_captured_value)
+                                gb.move(original_pos, (new_col, new_row))
+                                gb.curr_player = 'white' if gb.curr_player == 'black' else 'black'
+                                gb.check_white = gb.check_black = False
 
-                    if [new_col, new_row] in moves or [new_col, new_row] in attack_moves:
-                        if original_pos[0] != new_col or original_pos[1] != new_row:
-                            gb.move(original_pos, (new_col, new_row))
-                            move_id = selected_piece.get_identificator()[1] + letters[new_row] + str(8 - new_col)
-                            history.append(move_id)
-                            selected_piece.last_move = history[-1] if history else None
-                            gb.curr_player = 'white' if gb.curr_player == 'black' else 'black'
-                            gb.check_white = gb.check_black = False
+                        selected_piece = None
+                        moves, attack_moves = None, None
+                        mouse_down = False
 
-                    selected_piece = None
-                    moves, attack_moves = None, None
-                    mouse_down = False
-                # calculate mate TODO not working yet
-                mate = gb.calculate_mate(gb.curr_player)
+                    # calculate mate TODO not working yet
+                    mate = gb.calculate_mate(gb.curr_player)
 
+                # if promoting_piece is not none
+                else:
+                    show_promotion_window(screen, gb.promoting_piece.position)
+                    pygame.display.flip()
             else:
                 show_message(screen, 'white' if gb.curr_player == 'black' else 'black', "")
 
@@ -167,6 +183,8 @@ def main():
                 show_checks(screen, gb)
 
         pygame.display.flip()
+
+
     pygame.quit()
 
 
