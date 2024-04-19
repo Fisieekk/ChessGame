@@ -18,3 +18,4 @@ class Rook(Piece):
 
     def get_identificator(self):
         return self.color[0]+'R'
+

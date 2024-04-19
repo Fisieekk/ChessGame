@@ -6,7 +6,6 @@ from .Pieces.Queen import Queen
 from .Pieces.Rook import Rook
 from .Piece import Piece
 
-
 class Map:
     # Trzeba dodać zmienną przechowującą ostatni ruch. Potrzebna do en passant
     def __init__(self, width, height):
