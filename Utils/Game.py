@@ -2,7 +2,6 @@ import pygame
 import Utils.Map as mp
 from Utils.Pieces.King import King
 
-
 class Game:
     def __init__(self):
         self.BOARD_SIZE = 800

@@ -42,3 +42,5 @@ class Pawn(Piece):
     def get_identificator(self):
         return self.color[0]+'P'
 
+
+

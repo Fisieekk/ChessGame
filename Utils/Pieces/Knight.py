@@ -26,3 +26,4 @@ class Knight(Piece):
 
     def get_identificator(self):
         return self.color[0]+'N'
+

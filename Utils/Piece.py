@@ -5,7 +5,6 @@ class Piece:
         self.has_moved = False
         self.picture = None
         self.last_move = None
-
     # Getters
     def get_position(self):
         return self.position

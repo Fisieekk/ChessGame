@@ -21,3 +21,4 @@ class Bishop(Piece):
 
     def get_identificator(self):
         return self.color[0] + 'B'
+

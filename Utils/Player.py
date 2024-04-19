@@ -5,7 +5,6 @@ class Player:
         self.own=[]
         self.taken=[]
         self.king = True
-
 #Getter
     def get_name(self):
         return self.name
