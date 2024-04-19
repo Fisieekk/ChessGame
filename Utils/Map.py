@@ -6,6 +6,7 @@ from .Pieces.Queen import Queen
 from .Pieces.Rook import Rook
 from .Piece import Piece
 
+
 class Map:
     # Trzeba dodać zmienną przechowującą ostatni ruch. Potrzebna do en passant
     def __init__(self, width, height):
@@ -76,7 +77,7 @@ class Map:
         self.last_move = (start, end)
         if type(piece) == Pawn and (end[0] == 0 or end[0] == 7):
             self.promoting_piece = piece
-            self.promotion(piece,end)
+            self.promotion(piece, end)
         self.turn += 1
 
     def all_possible_attacks(self, color):
@@ -198,13 +199,26 @@ class Map:
 
     def evaluate_captured_piece(self, captured_piece):
         #strange check, but once happened
-        if captured_piece.get_identificator()[-1]=='K':
+        if captured_piece.get_identificator()[-1] == 'K':
             return
         if captured_piece.color == 'white':
             self.black_captured_value += self.weights[captured_piece.get_identificator()[1]]
         else:
             self.white_captured_value += self.weights[captured_piece.get_identificator()[1]]
 
+    def change_piece(self, identifier):
+        color = 'white' if identifier[0] == 'w' else 'black'
+        row, col = self.promoting_piece.position
+        if identifier[1] == 'Q':
+            self.board[row][col] = Queen([row, col], color)
+        elif identifier[1] == 'N':
+            self.board[row][col] = Knight([row, col], color)
+        elif identifier[1] == 'R':
+            self.board[row][col] = Rook([row, col], color)
+        else:
+            self.board[row][col] = Bishop([row, col], color)
+
+        self.promoting_piece=None
     # def preventer(self,start,end):
     #     old_y,old_x=start
     #     new_y,new_x=end
