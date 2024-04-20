@@ -93,8 +93,8 @@ class Game:
         message = color[0].upper() + color[1:] + ' won by checkmate'
         font = pygame.font.Font(None, 36)
         text = font.render(message, True, self.BLACK)
-        #text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
-        #self.screen.blit(text, text_rect)
+        text_rect = text.get_rect(center=((self.X_OFFSET+self.BOARD_SIZE) // 2, (self.Y_OFFSET+self.BOARD_SIZE)  // 2))
+        self.screen.blit(text, text_rect)
 
     # gets screen and pawn to be promoted
     # returns new piece to be placed on board
@@ -164,8 +164,6 @@ class Game:
         pygame.init()
         pygame.font.init()
         self.load_images()
-
-        # pygame.display.set_caption("Chess")
         timer = pygame.time.Clock()
 
         while self.running:
@@ -174,6 +172,7 @@ class Game:
             self.draw_board()
             self.draw_pieces()
             self.fps_counter += 1
+
             for event in pygame.event.get():
                 # quit
                 if event.type == pygame.QUIT:
@@ -181,21 +180,20 @@ class Game:
 
                 # if game not ended
                 elif not self.mate:
+                    # and we don't have a promotion
                     if not self.gb.promoting_piece:
-                        # click on piece
+                        # calculate mate
+                        self.mate = self.gb.calculate_mate()
+                        # selecting a piece
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             x, y = pygame.mouse.get_pos()
                             self.select_piece(x, y)
-                            # generate possible moves for selected piece depending on type
                             self.update_possible_moves()
 
                         # if we have selected piece we can make a move
                         if event.type == pygame.MOUSEBUTTONUP and self.selected_piece:
                             x, y = pygame.mouse.get_pos()
                             self.make_move(x, y)
-
-                        # calculate mate TODO not working yet
-                        self.mate = self.gb.calculate_mate(self.gb.curr_player)
 
                     # if promoting_piece is not none
                     else:
@@ -209,16 +207,15 @@ class Game:
                 else:
                     self.show_message('white' if self.gb.curr_player == 'black' else 'black', " ")
 
-            # dragging piece
-            if self.mouse_down and self.selected_piece:
-                x, y = pygame.mouse.get_pos()
-                self.drag_piece(x, y)
+                    # dragging piece
+                if self.mouse_down and self.selected_piece:
+                    x, y = pygame.mouse.get_pos()
+                    self.drag_piece(x, y)
 
-            if self.mouse_down:
-                self.draw_possible_moves()
-                # if self.gb.check_white or self.gb.check_black:
-                #     self.show_checks()
-
+                if self.mouse_down:
+                    self.draw_possible_moves()
+                        # if self.gb.check_white or self.gb.check_black:
+                        #     self.show_checks()
             pygame.display.flip()
 
         pygame.quit()
