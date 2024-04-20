@@ -194,28 +194,23 @@ class Game:
                         if event.type == pygame.MOUSEBUTTONUP and self.selected_piece:
                             x, y = pygame.mouse.get_pos()
                             self.make_move(x, y)
-
-                    # if promoting_piece is not none
-                    else:
-                        # show and handle promotion TODO not working yet
-                        self.show_promotion(self.gb.promoting_piece.position)
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            x, y = pygame.mouse.get_pos()
-                            if self.handle_promotion(x, y):
-                                self.gb.promoting_piece = None
-
-                else:
-                    self.show_message('white' if self.gb.curr_player == 'black' else 'black', " ")
-
-                    # dragging piece
-                if self.mouse_down and self.selected_piece:
+            if self.mate:
+                self.show_message('white' if self.gb.curr_player == 'black' else 'black', " ")
+            if self.gb.promoting_piece:
+                self.show_promotion(self.gb.promoting_piece.position)
+                if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
-                    self.drag_piece(x, y)
+                    if self.handle_promotion(x, y):
+                        self.gb.promoting_piece = None
+                    # dragging piece
+            if self.mouse_down and self.selected_piece:
+                x, y = pygame.mouse.get_pos()
+                self.drag_piece(x, y)
 
-                if self.mouse_down:
-                    self.draw_possible_moves()
-                        # if self.gb.check_white or self.gb.check_black:
-                        #     self.show_checks()
+            if self.mouse_down:
+                self.draw_possible_moves()
+                    # if self.gb.check_white or self.gb.check_black:
+                    #     self.show_checks()
             pygame.display.flip()
 
         pygame.quit()
