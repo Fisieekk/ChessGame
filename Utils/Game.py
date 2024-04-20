@@ -140,7 +140,7 @@ class Game:
         if 0 < x - self.X_OFFSET < self.BOARD_SIZE and 0 < y - self.Y_OFFSET < self.BOARD_SIZE:
             new_row, new_col = (x - self.X_OFFSET) // self.SQUARE_SIZE, (y - self.Y_OFFSET) // self.SQUARE_SIZE
             if [new_col, new_row] in self.moves or [new_col, new_row] in self.attack_moves:
-                if self.original_pos[0] != new_row or self.original_pos[1] != new_col:
+                if self.original_pos[1] != new_row or self.original_pos[0] != new_col:
                     if self.gb.board[new_col][new_row]:
                         self.captured_pieces.append(self.gb.board[new_col][new_row].get_identificator())
                         self.gb.evaluate_captured_piece(self.gb.board[new_col][new_row])

@@ -25,6 +25,7 @@ class Pawn(Piece):
             new_x = self.x + i
             if new_x<8 and new_x>=0 and new_y>=0 and new_y<8 and board.board[new_y][new_x] and board.board[new_y][new_x].color != self.color:
                 attack_moves.append([new_y,new_x])
+
         # en_passant_moves = []
         # for i in (-1, 1):
         #     if self.x + i >= 0 and self.x + i < 8 and self.y>0 and self.y<8:
