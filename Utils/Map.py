@@ -158,6 +158,17 @@ class Map:
         self.board[old_y][old_x] = piece
         return moves, attack_moves
 
+    def check(self,color):
+        if color == "white" and self.white_king_position in self.all_possible_attacks("black"):
+                self.check_white=True
+                self.check_black=False
+        elif color=='black' and self.black_king_position in self.all_possible_attacks("white"):
+                self.check_white=False
+                self.check_black=True
+        else:
+            self.check_white=False
+            self.check_black=False
+
     def castle(self, moves, attack_moves, piece):
         if piece.last_move is not None:
             return moves, attack_moves
@@ -187,7 +198,6 @@ class Map:
         if not king_checked:
             return False
         friendly_moves = self.all_possible_moves(self.curr_player)
-        #print(self.curr_player, ' possible moves: ',len(friendly_moves))
         if len(friendly_moves) == 0:
             return True
         return False
