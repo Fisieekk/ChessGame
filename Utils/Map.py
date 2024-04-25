@@ -42,6 +42,18 @@ class Map:
              King((7, 4), 'white'), Bishop((7, 5), 'white'), Knight((7, 6), 'white'), Rook((7, 7), 'white')]
         ]
 
+    def stalemate_test(self):
+        self.board = [
+            [King((0, 0), 'black'), None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, Queen((7, 3), 'white'),
+             King((7, 4), 'white'), None, None, None]
+        ]
     def move(self, start, end):
         piece, self.board[start[0]][start[1]] = self.board[start[0]][start[1]], None
         if type(piece) == King:
@@ -95,7 +107,7 @@ class Map:
             for j in range(8):
                 if self.board[i][j] is not None and self.board[i][j].color == color:
                     moves, attack_moves = self.board[i][j].can_move(self)
-                    moves, attack_moves = self.preventer(moves,attack_moves,self.board[i][j])
+                    moves, attack_moves = self.preventer(moves, attack_moves, self.board[i][j])
                     possible_moves += attack_moves
                     possible_moves += moves
         return possible_moves
@@ -158,16 +170,16 @@ class Map:
         self.board[old_y][old_x] = piece
         return moves, attack_moves
 
-    def check(self,color):
+    def check(self, color):
         if color == "white" and self.white_king_position in self.all_possible_attacks("black"):
-                self.check_white=True
-                self.check_black=False
-        elif color=='black' and self.black_king_position in self.all_possible_attacks("white"):
-                self.check_white=False
-                self.check_black=True
+            self.check_white = True
+            self.check_black = False
+        elif color == 'black' and self.black_king_position in self.all_possible_attacks("white"):
+            self.check_white = False
+            self.check_black = True
         else:
-            self.check_white=False
-            self.check_black=False
+            self.check_white = False
+            self.check_black = False
 
     def castle(self, moves, attack_moves, piece):
         if piece.last_move is not None:
@@ -193,12 +205,19 @@ class Map:
 
         return moves, attack_moves
 
+
     def calculate_mate(self):
-        king_checked = self.check_white if self.curr_player == 'white' else self.check_black
-        if not king_checked:
+        if not self.check_white and not self.check_black:
             return False
         friendly_moves = self.all_possible_moves(self.curr_player)
         if len(friendly_moves) == 0:
+            return True
+        return False
+
+    def calculate_stalemate(self):
+        if self.check_white or self.check_black:
+            return False
+        if len(self.all_possible_moves(self.curr_player)) == 0:
             return True
         return False
 
@@ -228,7 +247,7 @@ class Map:
         else:
             self.board[row][col] = Bishop([row, col], color)
 
-        self.promoting_piece=None
+        self.promoting_piece = None
     # def preventer(self,start,end):
     #     old_y,old_x=start
     #     new_y,new_x=end
