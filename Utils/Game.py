@@ -45,6 +45,7 @@ class Game:
         self.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         self.fps_counter = 0
         self.mate = False
+        self.stalemate=False
         self.promoting_pieces = None
 
     # reinitializes board after clicking start
@@ -62,6 +63,7 @@ class Game:
         self.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         self.fps_counter = 0
         self.mate = False
+        self.stalemate=False
         self.promoting_pieces = None
 
     def load_images(self):
@@ -117,7 +119,8 @@ class Game:
         self.screen.blit(move_surface, (self.X_OFFSET + c * self.SQUARE_SIZE, self.Y_OFFSET + r * self.SQUARE_SIZE))
 
     def show_message(self, color, message):
-        message = color[0].upper() + color[1:] + ' won by checkmate'
+        if message is None:
+            message = color[0].upper() + color[1:] + ' won by checkmate'
         font = pygame.font.Font(None, 72)
         text = font.render(message, True, self.GREEN)
         text_rect = text.get_rect(center=(
@@ -183,6 +186,7 @@ class Game:
                     self.gb.curr_player = 'white' if self.gb.curr_player == 'black' else 'black'
                     self.gb.check(self.gb.curr_player)
                     self.mate = self.gb.calculate_mate()
+                    self.gb.calculate_stalemate()
 
         self.selected_piece = None
         self.moves, self.attack_moves = None, None
@@ -280,7 +284,7 @@ class Game:
                     self.reset_clicked(x, y)
 
                 # if game not ended
-                if not self.mate:
+                if not self.mate and not self.stalemate:
                     # and we don't have a promotion
                     if not self.gb.promoting_piece:
                         # selecting a piece
@@ -295,7 +299,10 @@ class Game:
                             self.make_move(x, y)
 
             if self.mate:
-                self.show_message('white' if self.gb.curr_player == 'black' else 'black', " ")
+                self.show_message('white' if self.gb.curr_player == 'black' else 'black', None)
+
+            elif self.stalemate:
+                self.show_message(None, "Stalemate")
 
             if self.gb.promoting_piece:
                 self.show_promotion(self.gb.promoting_piece.position)
