@@ -86,11 +86,16 @@ class Map:
         piece.last_move = self.turn
         self.board[end[0]][end[1]] = piece
         self.history.append((piece, self.turn, piece.color, piece.type, start, end))
-        self.last_move = (start, end)
+        self.last_move = (start, end,piece)
         if type(piece) == Pawn and (end[0] == 0 or end[0] == 7):
             self.promoting_piece = piece
             self.promotion(piece, end)
         self.turn += 1
+
+    def en_passant_move(self,start,end):
+        print("en passant")
+        self.board[start[0]][end[1]] = None
+        self.move(start,end)
 
     def all_possible_attacks(self, color):
         possible_attacks = []
@@ -128,13 +133,9 @@ class Map:
             if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
-                    self.check_white = True
-            elif self.black_king_position in self.all_possible_attacks("white"):
-                moves_to_remove.append(move)
-                self.check_black = True
             else:
-                self.check_white = False
-                self.check_black = False
+                if self.black_king_position in self.all_possible_attacks("white"):
+                    moves_to_remove.append(move)
             self.board[new_y][new_x] = None
             if type(piece) == King:
                 if color == "white":

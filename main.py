@@ -8,6 +8,6 @@ import Utils.Game
 # Promotion works but GUI is terrible xDDD
 
 game = Utils.Game.Game()
-#game.gb.stalemate_test()
+game.gb.stalemate_test()
 game.main()
 

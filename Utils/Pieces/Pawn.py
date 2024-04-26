@@ -21,21 +21,15 @@ class Pawn(Piece):
                 if board.board[new_y][self.x] == None:
                     moves.append([new_y,self.x])
         new_y = self.y + poss_change
+        en_passant_moves = []
         for i in (-1,1):
             new_x = self.x + i
             if new_x<8 and new_x>=0 and new_y>=0 and new_y<8 and board.board[new_y][new_x] and board.board[new_y][new_x].color != self.color:
                 attack_moves.append([new_y,new_x])
-
-        # en_passant_moves = []
-        # for i in (-1, 1):
-        #     if self.x + i >= 0 and self.x + i < 8 and self.y>0 and self.y<8:
-        #         possible_target = board.board[self.y][self.x + i]
-        #         if type(possible_target) == Pawn and self.color != possible_target.color:
-        #             last_move = board.last_move()
-        #             if last_move is not None and last_move[2] == self.symbol and last_move[0][4] == self.x + i \
-        #                     and abs(last_move[4][1] - last_move[3][1]) == 2:
-        #                 en_passant_moves.append([self.y, self.x + i])
-        # attack_moves+=en_passant_moves
+            if (board.last_move):
+                if new_x<8 and new_x>=0 and self.y == board.last_move[1][0] and new_y == board.last_move[1][0]+poss_change and new_x == board.last_move[1][1] and type(board.last_move[2])==Pawn:
+                    en_passant_moves.append([new_y,new_x])
+        attack_moves += en_passant_moves
         return moves, attack_moves
     def get_type(self):
         return self.type
