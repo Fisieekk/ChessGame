@@ -1,8 +1,7 @@
 import pygame
 import Utils.Map as mp
 from Utils.Pieces.King import King
-from Utils.Pieces.Queen import Queen
-
+from Utils.Pieces.Pawn import Pawn
 
 class Game:
     def __init__(self):
@@ -168,25 +167,37 @@ class Game:
 
     def make_move(self, x, y):
         if 0 < x - self.X_OFFSET < self.BOARD_SIZE and 0 < y - self.Y_OFFSET < self.BOARD_SIZE:
-            new_row, new_col = (x - self.X_OFFSET) // self.SQUARE_SIZE, (y - self.Y_OFFSET) // self.SQUARE_SIZE
-            if [new_col, new_row] in self.moves or [new_col, new_row] in self.attack_moves:
-                if self.original_pos[1] != new_row or self.original_pos[0] != new_col:
-                    if self.gb.board[new_col][new_row]:
-                        self.captured_pieces.append(self.gb.board[new_col][new_row].get_identificator())
-                        self.gb.evaluate_captured_piece(self.gb.board[new_col][new_row])
+            new_col, new_row = (x - self.X_OFFSET) // self.SQUARE_SIZE, (y - self.Y_OFFSET) // self.SQUARE_SIZE
+            if [new_row, new_col] in self.moves or [new_row, new_col] in self.attack_moves:
+                if self.original_pos[1] != new_col or self.original_pos[0] != new_row:
+                    if type(self.gb.board[self.original_pos[0]][self.original_pos[1]])==Pawn and [new_row,new_col] in self.attack_moves and type(self.gb.board[self.original_pos[0]][new_col])==Pawn:
+                        self.captured_pieces.append(self.gb.board[self.original_pos[0]][new_col].get_identificator())
+                        self.gb.evaluate_captured_piece(self.gb.board[self.original_pos[0]][new_col])
                         print('Captured value: ')
                         print('White: ', self.gb.white_captured_value, ' Black: ',
-                              self.gb.black_captured_value)
-                        move_id = self.selected_piece.get_identificator()[1] + self.letters[new_row] + str(
-                            8 - new_col)
+                            self.gb.black_captured_value)
+                        move_id = self.selected_piece.get_identificator()[1] + self.letters[new_col] + str(
+                            8 - new_row)
                         self.gb.history.append(move_id)
-                        self.selected_piece.last_move = self.gb.history[-1] if self.gb.history else None
+                        self.selected_piece.last_move = self.gb.history[-1] if self.gb.history else None 
+                        self.gb.en_passant_move(self.original_pos, (new_row, new_col))
+                    else:
+                        if self.gb.board[new_row][new_col]:
+                            self.captured_pieces.append(self.gb.board[new_row][new_col].get_identificator())
+                            self.gb.evaluate_captured_piece(self.gb.board[new_row][new_col])
+                            print('Captured value: ')
+                            print('White: ', self.gb.white_captured_value, ' Black: ',
+                                self.gb.black_captured_value)
+                            move_id = self.selected_piece.get_identificator()[1] + self.letters[new_col] + str(
+                                8 - new_row)
+                            self.gb.history.append(move_id)
+                            self.selected_piece.last_move = self.gb.history[-1] if self.gb.history else None
 
-                    self.gb.move(self.original_pos, (new_col, new_row))
+                        self.gb.move(self.original_pos, (new_row, new_col))
                     self.gb.curr_player = 'white' if self.gb.curr_player == 'black' else 'black'
                     self.gb.check(self.gb.curr_player)
                     self.mate = self.gb.calculate_mate()
-                    self.gb.calculate_stalemate()
+                    self.stalemate= self.gb.calculate_stalemate()
 
         self.selected_piece = None
         self.moves, self.attack_moves = None, None
@@ -318,7 +329,6 @@ class Game:
 
             if self.mouse_down:
                 self.draw_possible_moves()
-
             if self.gb.check_white or self.gb.check_black:
                 self.show_checks()
 
