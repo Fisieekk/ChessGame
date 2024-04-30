@@ -160,10 +160,10 @@ class Game:
 
     def update_possible_moves(self):
         if self.selected_piece:
-            moves, attack_moves = self.selected_piece.can_move(self.gb)
-            self.moves, self.attack_moves = self.gb.preventer(moves, attack_moves, self.selected_piece)
+            self.moves, self.attack_moves = self.selected_piece.can_move(self.gb)
             if type(self.selected_piece) == King:
                 self.moves, self.attack_moves = self.gb.castle(self.moves, self.attack_moves, self.selected_piece)
+            self.moves, self.attack_moves = self.gb.preventer(self.moves, self.attack_moves, self.selected_piece)
 
     def make_move(self, x, y):
         if 0 < x - self.X_OFFSET < self.BOARD_SIZE and 0 < y - self.Y_OFFSET < self.BOARD_SIZE:
