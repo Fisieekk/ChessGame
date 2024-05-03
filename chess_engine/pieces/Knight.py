@@ -1,11 +1,11 @@
-from ChessEngine.Piece import Piece, Position
+from chess_engine.Piece import Piece, Position
 
 
 class Knight(Piece):
     def __init__(self, y: int, x: int, color: str):
         super().__init__(y, x, color)
         self.type = "Knight"
-        self.photo = "Images/wN.png" if color == "white" else "Images/bN.png"
+        self.photo = "images/wN.png" if color == "white" else "images/bN.png"
 
     def can_move(self, map) -> tuple:
         moves = []
@@ -16,10 +16,10 @@ class Knight(Piece):
                 new_position = Position(x=self.position.x + i, y=self.position.y + j)
                 if abs(i) != abs(j) and new_position.in_board():
                     if map.board[new_position.y][new_position.x] is None:
-                        moves.append([new_position.y, new_position.x])
+                        moves.append(new_position)
                     else:
                         if map.board[new_position.y][new_position.x].color != self.color:
-                            attack_moves.append([new_position.y, new_position.x])
+                            attack_moves.append(new_position)
         return moves, attack_moves
 
     def get_identificator(self) -> str:

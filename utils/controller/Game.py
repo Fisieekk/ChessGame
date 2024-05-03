@@ -1,11 +1,6 @@
 import pygame
-from ChessEngine.Map import Map
-from ChessEngine.Pieces import King
-from ChessEngine.Pieces.Pawn import Pawn
-from Utils.Controller.GameConfig import GameConfig as gc
-from ChessEngine.Position import Position
-
-
+from chess_engine import *
+from .GameConfig import GameConfig as gc
 class Game:
     def __init__(self):
         self.IMAGES = {}
@@ -45,7 +40,7 @@ class Game:
     def load_images(self) -> None:
         pieces = ['wR', 'wN', 'wB', 'wQ', 'wK', 'wP', 'bR', 'bN', 'bB', 'bQ', 'bK', 'bP']
         for piece in pieces:
-            self.IMAGES[piece] = pygame.transform.scale(pygame.image.load('Utils/Images/' + piece + '.png'),
+            self.IMAGES[piece] = pygame.transform.scale(pygame.image.load('utils/images/' + piece + '.png'),
                                                         (gc.SQUARE_SIZE, gc.SQUARE_SIZE))
 
     def draw_board(self) -> None:
@@ -71,12 +66,14 @@ class Game:
 
     # we are never getting here
     def draw_possible_moves(self) -> None:
-        for r, c in self.moves:
+        for move in self.moves:
+            r,c=(move.y,move.x)
             move_surface = pygame.Surface((gc.SQUARE_SIZE, gc.SQUARE_SIZE), pygame.SRCALPHA)
             move_surface.fill(gc.COLORS["GREEN"])
             self.screen.blit(move_surface, (gc.X_OFFSET + c * gc.SQUARE_SIZE, gc.Y_OFFSET + r * gc.SQUARE_SIZE))
 
-        for r, c in self.attack_moves:
+        for move in self.attack_moves:
+            r, c = (move.y, move.x)
             attack_surface = pygame.Surface((gc.SQUARE_SIZE, gc.SQUARE_SIZE), pygame.SRCALPHA)
             attack_surface.fill(gc.COLORS["RED"])
             self.screen.blit(attack_surface,
@@ -119,7 +116,6 @@ class Game:
     def handle_promotion(self, x: int, y: int) -> None:
         for identifier, position in self.promoting_pieces:
             if position.collidepoint(x, y):
-                print('Promoting to: ', identifier)
                 self.map.change_piece(identifier)
 
     def select_piece(self, x: int, y: int) -> None:
@@ -141,9 +137,11 @@ class Game:
             if type(self.selected_piece) == King:
                 self.moves, self.attack_moves = self.map.castle(self.moves, self.attack_moves, self.selected_piece)
             self.moves, self.attack_moves = self.map.preventer(self.moves, self.attack_moves, self.selected_piece)
+        print('Moves: ', self.moves)
+        print('Attack moves: ', self.attack_moves)
 
     def en_passant_verification(self, new_position: Position) -> bool:
-        return (type(self.map.board[self.original_pos.y][self.original_pos.x]) == Pawn and [new_position.y,new_position.x]
+        return (type(self.map.board[self.original_pos.y][self.original_pos.x]) == Pawn and new_position
                 in self.attack_moves and type(self.map.board[self.original_pos.y][new_position.x]) == Pawn)
 
     def en_passant_move(self, new_position: Position) -> None:
@@ -161,7 +159,7 @@ class Game:
     def choose_type_of_move(self, x: int, y: int) -> None:
         if 0 < x - gc.X_OFFSET < gc.BOARD_SIZE and 0 < y - gc.Y_OFFSET < gc.BOARD_SIZE:
             new_position = Position(x=((x - gc.X_OFFSET) // gc.SQUARE_SIZE), y=((y - gc.Y_OFFSET) // gc.SQUARE_SIZE))
-            if [new_position.y, new_position.x] in self.moves or [new_position.y, new_position.x] in self.attack_moves:
+            if new_position in self.moves or new_position in self.attack_moves:
                 if self.original_pos.x != new_position.x or self.original_pos.y != new_position.y:
                     if self.en_passant_verification(new_position):
                         self.en_passant_move(new_position)

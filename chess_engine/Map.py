@@ -1,11 +1,7 @@
 from .Piece import Piece
-from .Pieces.Bishop import Bishop
-from .Pieces.King import King
-from .Pieces.Knight import Knight
-from .Pieces.Pawn import Pawn
-from .Pieces.Queen import Queen
-from .Pieces.Rook import Rook
 from .Position import Position
+
+from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
 
 class Map:
@@ -27,7 +23,6 @@ class Map:
         self.white_captured_value = 0
         self.black_captured_value = 0
         self.weights = {'P': 1, 'B': 3, 'N': 3, 'R': 5, 'Q': 9}
-        print(Rook)
         self.board = [
             [Rook(0, 0, 'black'), Knight(0, 1, 'black'), Bishop(0, 2, 'black'), Queen(0, 3, 'black'),
              King(0, 4, 'black'), Bishop(0, 5, 'black'), Knight(0, 6, 'black'), Rook(0, 7, 'black')],
@@ -62,21 +57,21 @@ class Map:
             if piece.color == "white" and not self.white_king_moved:
                 self.white_king_position = end
                 if (end.y, end.x) == (7, 6):
-                    self.board[7][7].move(7, 5)
+                    self.board[7][7].move(Position(x=5, y=7))
                     self.board[7][5] = self.board[7][7]
                     self.board[7][7] = None
                 elif (end.y, end.x) == (7, 2):
-                    self.board[7][0].move(7, 3)
+                    self.board[7][0].move(Position(x=3, y=7))
                     self.board[7][3] = self.board[7][0]
                     self.board[7][0] = None
 
             elif piece.color == "black" and not self.black_king_moved:
-                self.black_king_position = [end.y, end.x]
-                if end == (0, 6):
+                self.black_king_position = end
+                if (end.y, end.x) == (0, 6):
                     self.board[0][7].move(Position(x=5, y=0))
                     self.board[0][5] = self.board[0][7]
                     self.board[0][7] = None
-                elif end == (0, 2):
+                elif (end.y, end.x) == (0, 2):
                     self.board[0][0].move(Position(x=3, y=0))
                     self.board[0][3] = self.board[0][0]
                     self.board[0][0] = None
@@ -124,46 +119,46 @@ class Map:
         color = piece.color
         moves_to_remove = []
         for move in moves:
-            new_y, new_x = move
-            self.board[new_y][new_x] = piece
+            new_position = move
+            self.board[new_position.y][new_position.x] = piece
             if type(piece) == King:
                 if color == "white":
-                    self.white_king_position = [new_y, new_x]
+                    self.white_king_position = new_position
                 else:
-                    self.black_king_position = [new_y, new_x]
+                    self.black_king_position = new_position
             if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
             else:
                 if self.black_king_position in self.all_possible_attacks("white"):
                     moves_to_remove.append(move)
-            self.board[new_y][new_x] = None
+            self.board[new_position.y][new_position.x] = None
             if type(piece) == King:
                 if color == "white":
-                    self.white_king_position = [old_position.y, old_position.x]
+                    self.white_king_position = old_position
                 else:
-                    self.black_king_position = [old_position.y, old_position.x]
+                    self.black_king_position = old_position
         for move in attack_moves:
-            new_y, new_x = move
-            temp, self.board[new_y][new_x] = self.board[new_y][new_x], piece
+            new_position = move
+            temp, self.board[new_position.y][new_position.x] = self.board[new_position.y][new_position.x], piece
             if type(piece) == King:
                 if color == "white":
-                    self.white_king_position = [new_y, new_x]
+                    self.white_king_position = [new_position.y, new_position.x]
                 else:
-                    self.black_king_position = [new_y, new_x]
+                    self.black_king_position = [new_position.y, new_position.x]
             if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
             else:
                 if self.black_king_position in self.all_possible_attacks("white"):
                     moves_to_remove.append(move)
-            self.board[new_y][new_x] = temp
+            self.board[new_position.y][new_position.x] = temp
             self.board[old_position.y][old_position.x] = piece
             if type(piece) == King:
                 if color == "white":
-                    self.white_king_position = [old_position.y, old_position.x]
+                    self.white_king_position = old_position
                 else:
-                    self.black_king_position = [old_position.y, old_position.x]
+                    self.black_king_position = old_position
         for move in moves_to_remove:
             if move in moves:
                 moves.remove(move)
@@ -173,6 +168,10 @@ class Map:
         return moves, attack_moves
 
     def check(self, color: str) -> None:
+        print("here")
+        print(color)
+        print(self.all_possible_attacks("white"))
+        print(self.black_king_position)
         if color == "white" and self.white_king_position in self.all_possible_attacks("black"):
             self.check_white = True
             self.check_black = False
@@ -190,20 +189,20 @@ class Map:
             if self.board[7][7] is not None:
                 if self.board[7][7].last_move is None:
                     if self.board[7][6] is None and self.board[7][5] is None:
-                        moves.append((7, 6))
+                        moves.append(Position(x=6, y=7))
             if self.board[7][0] is not None:
                 if self.board[7][0].last_move is None:
                     if self.board[7][1] is None and self.board[7][2] is None and self.board[7][3] is None:
-                        moves.append((7, 2))
+                        moves.append(Position(x=2, y=7))
         else:
             if self.board[0][7] is not None:
                 if self.board[0][7].last_move is None:
                     if self.board[0][6] is None and self.board[0][5] is None:
-                        moves.append((0, 6))
+                        moves.append(Position(x=6, y=0))
             if self.board[0][0] is not None:
                 if self.board[0][0].last_move is None:
                     if self.board[0][1] is None and self.board[0][2] is None and self.board[0][3] is None:
-                        moves.append((0, 2))
+                        moves.append(Position(x=2, y=0))
 
         return moves, attack_moves
 

@@ -1,11 +1,11 @@
-from ChessEngine.Piece import Piece, Position
+from chess_engine.Piece import Piece, Position
 
 
 class Pawn(Piece):
     def __init__(self, y: int, x: int, color: str):
         super().__init__(y, x, color)
         self.type = "Pawn"
-        self.photo = "Images/wp.png" if color == "white" else "Images/bp.png"
+        self.photo = "images/wp.png" if color == "white" else "images/bp.png"
 
     def can_move(self, map) -> tuple:
         if self.color == "white":
@@ -16,21 +16,20 @@ class Pawn(Piece):
         attack_moves = []
         new_position = Position(x=self.position.x, y=self.position.y + position_change)
         if new_position.in_board() and map.board[new_position.y][new_position.x] is None:
-            moves.append([new_position.y, new_position.x])
+            moves.append(new_position)
             if self.last_move is None:
-                new_position.y += position_change
+                new_position=Position(x=new_position.x, y=new_position.y + position_change)
                 if map.board[new_position.y][new_position.x] is None:
-                    moves.append([new_position.y, new_position.x])
-        new_position = Position(x=self.position.x, y=self.position.y + position_change)
+                    moves.append(new_position)
         for i in (-1, 1):
-            new_position.x = self.position.x + i
+            new_position = Position(x=self.position.x+i, y=self.position.y + position_change)
             if new_position.in_board() and map.board[new_position.y][new_position.x] and map.board[new_position.y][
                 new_position.x].color != self.color:
-                attack_moves.append([new_position.y, new_position.x])
+                attack_moves.append(new_position)
             if map.last_move:
                 if new_position.in_board() and self.en_passant_verification(map, new_position,
                                                                             position_change):
-                    attack_moves.append([new_position.y, new_position.x])
+                    attack_moves.append(new_position)
         return moves, attack_moves
 
     def en_passant_verification(self, map, new_position: Position, position_change : int) -> bool:

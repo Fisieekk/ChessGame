@@ -1,4 +1,4 @@
-from ChessEngine.Piece import Piece
+from chess_engine.Piece import Piece
 from .Bishop import Bishop
 from .Rook import Rook
 
@@ -7,7 +7,7 @@ class Queen(Piece):
     def __init__(self, y: int, x: int, color: str):
         super().__init__(y, x, color)
         self.type = "Queen"
-        self.photo = "Images/wQ.png" if color == "white" else "Images/bQ.png"
+        self.photo = "images/wQ.png" if color == "white" else "images/bQ.png"
 
     def can_move(self, map) -> tuple:
         bishop = Bishop(self.position.y, self.position.x, self.color)

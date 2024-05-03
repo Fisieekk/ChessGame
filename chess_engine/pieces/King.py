@@ -1,4 +1,4 @@
-from ChessEngine.Piece import Piece, Position
+from chess_engine.Piece import Piece, Position
 from .Rook import Rook
 
 
@@ -18,10 +18,10 @@ class King(Piece):
                 new_position = Position(x=self.position.x + j, y=self.position.y + i)
                 if (i != 0 or j != 0) and new_position.in_board():
                     if map.board[new_position.y][new_position.x] is None:
-                        moves.append([new_position.y, new_position.x])
+                        moves.append(new_position)
                     else:
                         if map.board[new_position.y][new_position.x].color != self.color:
-                            attack_moves.append([new_position.y, new_position.x])
+                            attack_moves.append(new_position)
 
         moves += castle_moves
         return moves, attack_moves
@@ -37,9 +37,9 @@ class King(Piece):
             if (self.can_castle(left_rook) and
                     (map.board[self.position.y][1] is None
                      and map.board[self.position.y][2] is None and map.board[self.position.y][3] is None)):
-                castle_moves.append([self.position.y, 2])
+                castle_moves.append(Position(x=2, y=self.position.y))
             if self.can_castle(right_rook) and (map.board[self.position.y][5] is None and map.board[self.position.y][6] is None):
-                castle_moves.append([self.position.y, 6])
+                castle_moves.append(Position(x=6, y=self.position.y))
 
         return castle_moves
 
