@@ -1,4 +1,4 @@
-import Utils.Game
+import Utils.Controller.Game
 
 # TODO: I found some bugs:
 #  Bug with Queen moving despite check is still a issue,
@@ -7,7 +7,7 @@ import Utils.Game
 # TODO: improve material_diff chart
 # Promotion works but GUI is terrible xDDD
 
-game = Utils.Game.Game()
-game.gb.stalemate_test()
+game = Utils.Controller.Game.Game()
+# game.gb.stalemate_test()
 game.main()
 
