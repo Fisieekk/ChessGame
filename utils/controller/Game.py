@@ -100,8 +100,8 @@ class Game:
             gc.X_OFFSET + gc.BOARD_SIZE // 2, gc.Y_OFFSET + gc.BOARD_SIZE // 2))
         self.screen.blit(text, text_rect)
 
-    def show_promotion_options(self, position: list) -> None:
-        r, c = position
+    def show_promotion_options(self, position: Position) -> None:
+        c,r = position.x, position.y
         color, positions = ('b', [2, 3, 4, 5]) if r == 7 else ('w', [5, 4, 3, 2])
         r = -1.1 if r == 0 else 8.1
         rectangles = [

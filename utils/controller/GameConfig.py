@@ -24,7 +24,5 @@ class GameConfig:
         "LIGHT_GRAY": (169, 169, 169),
         "BEIGE": (255, 246, 231),
     }
+    LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     fps = 30
-
-
-
