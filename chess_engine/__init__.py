@@ -1,6 +1,6 @@
 from .pieces import *
-from .Map import Map
-from .Piece import Piece
-from .Position import Position
+from .map import Map
+from .piece import Piece
+from .position import Position
 
 

@@ -1,4 +1,4 @@
-from chess_engine.Piece import Piece, Position
+from chess_engine.piece import Piece, Position
 
 
 class Knight(Piece):

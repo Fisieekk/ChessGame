@@ -1,6 +1,6 @@
-from chess_engine.Piece import Piece
-from .Bishop import Bishop
-from .Rook import Rook
+from chess_engine.piece import Piece
+from .bishop import Bishop
+from .rook import Rook
 
 
 class Queen(Piece):

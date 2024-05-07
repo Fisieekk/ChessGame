@@ -1,3 +1,6 @@
+import pygame
+
+
 class GameConfig:
     ROW = 8
     COLUMN = 8
@@ -25,4 +28,11 @@ class GameConfig:
         "BEIGE": (255, 246, 231),
     }
     LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    fps = 30
+    FPS = 30
+    IMAGES = {}
+
+    def load_images(self) -> None:
+        pieces = ['wR', 'wN', 'wB', 'wQ', 'wK', 'wP', 'bR', 'bN', 'bB', 'bQ', 'bK', 'bP']
+        for piece in pieces:
+            self.IMAGES[piece] = pygame.transform.scale(pygame.image.load('utils/images/' + piece + '.png'),
+                                                        (self.SQUARE_SIZE, self.SQUARE_SIZE))

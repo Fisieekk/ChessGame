@@ -1,5 +1,5 @@
-from chess_engine.Piece import Piece, Position
-from .Rook import Rook
+from chess_engine.piece import Piece, Position
+from .rook import Rook
 
 
 class King(Piece):

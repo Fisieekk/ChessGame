@@ -1,7 +1,7 @@
-from .Rook import Rook
-from .Knight import Knight
-from .Bishop import Bishop
-from .Queen import Queen
-from .King import King
-from .Pawn import Pawn
+from .rook import Rook
+from .knight import Knight
+from .bishop import Bishop
+from .queen import Queen
+from .king import King
+from .pawn import Pawn
 

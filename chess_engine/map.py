@@ -1,5 +1,7 @@
-from .Piece import Piece
-from .Position import Position
+from typing import Optional
+
+from .piece import Piece
+from .position import Position
 
 from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
@@ -37,6 +39,7 @@ class Map:
             [Rook(7, 0, 'white'), Knight(7, 1, 'white'), Bishop(7, 2, 'white'), Queen(7, 3, 'white'),
              King(7, 4, 'white'), Bishop(7, 5, 'white'), Knight(7, 6, 'white'), Rook(7, 7, 'white')]
         ]
+
 
     def stalemate_test(self):
         self.board = [
@@ -243,3 +246,5 @@ class Map:
             self.board[row][col] = Bishop(row, col, color)
 
         self.promoting_piece = None
+
+    # def add_move_to_history(self, piece: Piece, old_position: Position, special_move: Optional[str]):
