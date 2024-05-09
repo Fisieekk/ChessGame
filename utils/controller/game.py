@@ -114,9 +114,6 @@ class Game:
         if button_rect.collidepoint(x, y):
             self.reinitialize()
 
-    # # TODO Implement undo_clicked
-    # def undo_clicked(self) :
-    #     pass
 
     def main(self) -> None:
         pygame.init()

@@ -33,8 +33,9 @@ class Pawn(Piece):
         return moves, attack_moves
 
     def en_passant_verification(self, map, new_position: Position, position_change : int) -> bool:
+        print(map.last_move,"LAST")
         return self.position.y == map.last_move[1].y and new_position.y == map.last_move[1].y + position_change and new_position.x == \
-            map.last_move[1].x and type(map.last_move[2]) == Pawn
+            map.last_move[1].x and type(map.last_move[2]) == Pawn and abs(map.last_move[1].y - map.last_move[0].y) == 2
 
     def get_identificator(self) -> str:
         return self.color[0] + 'P'
