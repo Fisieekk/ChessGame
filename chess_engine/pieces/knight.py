@@ -8,6 +8,11 @@ class Knight(Piece):
         self.photo = "images/wN.png" if color == "white" else "images/bN.png"
 
     def can_move(self, map) -> tuple:
+        """
+        Method to get the possible moves of the piece.
+        :param map: map of the game
+        :return: tuple with the possible moves and the possible attacks
+        """
         moves = []
         attack_moves = []
         moves_comb = [-2, -1, 1, 2]
@@ -26,4 +31,10 @@ class Knight(Piece):
         return moves, attack_moves
 
     def get_identificator(self) -> str:
+        """
+        Method to get the identificator of the piece.
+        It creates a string with the first char of the color ("w" for "white" or "b" for "black") and the type of the piece.
+        It is used to identify the photo of the piece.
+        :return: identificator of the piece
+        """
         return self.color[0] + "N"

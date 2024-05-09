@@ -1,3 +1,4 @@
+import pygame
 from chess_engine.position import Position
 
 
@@ -9,17 +10,36 @@ class Piece:
         self.picture = None
         self.last_move = None
 
-    def get_picture(self) -> str:
+    def get_picture(self) -> pygame.image:
+        """
+        Get the picture of the piece
+        :return: pygame.image representing the piece
+        """
         return self.picture
 
-    def get_last_move(self) -> list:
+    def get_last_move(self) -> Position:
+        """
+        Get the last move of the piece
+        :return: position of the last move
+        """
         return self.last_move
 
     def move(self, position: Position) -> None:
+        """
+        Move the piece to the given position
+        :param position: Position to move the piece to
+        :return: None
+        """
         self.position = position
         self.has_moved = True
 
     def create_moves(self, map, output: list) -> tuple:
+        """
+        Create the moves of the piece
+        :param map: map of the game
+        :param output: list of moves
+        :return: tuple of moves and attack moves
+        """
         moves = []
         attack_moves = []
         for move in output:
@@ -46,4 +66,10 @@ class Piece:
         return moves, attack_moves
 
     def get_identificator(self) -> str:
+        """
+        Method to get the identificator of the piece. We are overriding this method in the subclasses.
+        It creates a string with the first char of the color ("w" for "white" or "b" for "black") and the type of the piece.
+        It is used to identify the photo of the piece.
+        :return: identificator of the piece
+        """
         pass

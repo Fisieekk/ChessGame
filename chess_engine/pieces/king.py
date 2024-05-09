@@ -9,6 +9,11 @@ class King(Piece):
         self.photo = "images/wK.png" if color == "white" else "images/bK.png"
 
     def can_move(self, map) -> tuple:
+        """
+        Method to get the possible moves of the piece.
+        :param map: map of the game
+        :return: tuple with the possible moves and the possible attacks
+        """
         moves = []
         attack_moves = []
         castle_moves = self.castle(map)
@@ -30,9 +35,19 @@ class King(Piece):
         return moves, attack_moves
 
     def can_castle(self, rook: Piece) -> bool:
+        """
+        Calculate if the king can castle with the rook.
+        :param rook: rook to castle
+        :return: True if the king can castle with the rook, False otherwise
+        """
         return rook is not None and isinstance(rook, Rook) and not rook.has_moved
 
     def castle(self, map) -> list:
+        """
+        Get the possible castle moves.
+        :param map: map of the game
+        :return: possible castle moves
+        """
         castle_moves = []
         left_rook = map.board[self.position.y][0]
         right_rook = map.board[self.position.y][7]
@@ -52,4 +67,10 @@ class King(Piece):
         return castle_moves
 
     def get_identificator(self) -> str:
+        """
+        Method to get the identificator of the piece.
+        It creates a string with the first char of the color ("w" for "white" or "b" for "black") and the type of the piece.
+        It is used to identify the photo of the piece.
+        :return: identificator of the piece
+        """
         return self.color[0] + "K"

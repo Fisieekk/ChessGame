@@ -1,5 +1,3 @@
-from typing import Optional
-
 from .piece import Piece
 from .position import Position
 from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
@@ -7,6 +5,10 @@ from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
 class Map:
     def __init__(self, width, height):
+        """
+        :param width: width of the board
+        :param height: height of the board
+        """
         self.curr_player = "white"
         self.history = []
         self.last_move = None
@@ -72,6 +74,10 @@ class Map:
         ]
 
     def stalemate_test(self):
+        """
+        Method to simplify the stalemate test. 
+        :return: none
+        """
         self.board = [
             [King(0, 0, "black"), None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
@@ -93,6 +99,12 @@ class Map:
         ]
 
     def move(self, start: Position, end: Position) -> None:
+        """
+        Method to move a piece from start to end position.
+        :param start: start position of piece 
+        :param end:  end position of piece
+        :return None
+        """
         piece, self.board[start.y][start.x] = self.board[start.y][start.x], None
         if type(piece) == King:
             if piece.color == "white" and not self.white_king_moved:
@@ -139,11 +151,22 @@ class Map:
         self.turn += 1
 
     def en_passant_move(self, start: Position, end: Position) -> None:
+        """
+        Method to move a piece using en passant.
+        :param start: start position of piece
+        :param end: end position of piece
+        :return None
+        """
         print("en passant")
         self.board[start.y][end.x] = None
         self.move(start, end)
 
     def all_possible_attacks(self, color: str) -> list:
+        """
+        Method to get all possible attacks for a given color.
+        :param color: color of the player
+        :return: None
+        """
         possible_attacks = []
         for i in range(8):
             for j in range(8):
@@ -153,6 +176,11 @@ class Map:
         return possible_attacks
 
     def all_possible_moves(self, color: str) -> list:
+        """
+        Method to get all possible moves for a given color.
+        :param color: color of the player
+        :return: list of possible moves
+        """
         possible_moves = []
         for i in range(8):
             for j in range(8):
@@ -168,6 +196,13 @@ class Map:
     def preventer(
         self, moves: list, attack_moves: list, piece: Piece
     ) -> tuple[list, list]:
+        """
+        Method to prevent a move that is illegal.
+        :param moves: all moves of the piece
+        :param attack_moves:  all attack moves of the piece
+        :param piece: piece to prevent
+        :return: lists of moves and attack moves
+        """
         old_position = piece.position
         self.board[old_position.y][old_position.x] = None
         color = piece.color
@@ -225,6 +260,11 @@ class Map:
         return moves, attack_moves
 
     def check(self, color: str) -> None:
+        """
+        Method to check if a player is in check.
+        :param color: color of the player
+        :return: None
+        """
         print("here")
         print(color)
         print(self.all_possible_attacks("white"))
@@ -246,6 +286,13 @@ class Map:
     def castle(
         self, moves: list, attack_moves: list, piece: Piece
     ) -> tuple[list, list]:
+        """
+        Method to add a castle to possible moves.
+        :param moves: possible moves of piece
+        :param attack_moves: possible attack moves of piece
+        :param piece: to castle
+        :return: lists of moves and attack moves
+        """
         if piece.last_move is not None:
             return moves, attack_moves
         if piece.color == "white":
@@ -278,6 +325,10 @@ class Map:
         return moves, attack_moves
 
     def calculate_mate(self) -> bool:
+        """
+        Method to calculate if a player is in mate.
+        :return: bool value True if player is in mate else False
+        """
         if not self.check_white and not self.check_black:
             return False
         friendly_moves = self.all_possible_moves(self.curr_player)
@@ -286,6 +337,10 @@ class Map:
         return False
 
     def calculate_stalemate(self) -> bool:
+        """
+        Method to calculate if there is a stalemate.
+        :return: bool value True if there is a stalemate else False
+        """
         if self.check_white or self.check_black:
             return False
         if len(self.all_possible_moves(self.curr_player)) == 0:
@@ -293,6 +348,11 @@ class Map:
         return False
 
     def evaluate_captured_piece(self, captured_piece: Piece) -> None:
+        """
+        Method to evaluate the captured piece.
+        :param captured_piece: piece that has been captured
+        :return: None
+        """
         if captured_piece.get_identificator()[-1] == "K":
             return
         if captured_piece.color == "white":
@@ -305,6 +365,11 @@ class Map:
             ]
 
     def change_piece(self, identifier: str) -> None:
+        """
+        Method to change a piece after promotion.
+        :param identifier: identifier of the piece to be placed on the board
+        :return: None
+        """
         color = "white" if identifier[0] == "w" else "black"
         position = self.promoting_piece.position
         row, col = position.y, position.x

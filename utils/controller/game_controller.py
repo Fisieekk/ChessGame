@@ -1,7 +1,5 @@
 from typing import Any, Optional
-
 import pygame
-
 from chess_engine import Map, Position, Piece
 from utils.controller.game_config import GameConfig
 
@@ -15,6 +13,10 @@ class GameController:
         )
 
     def draw_board(self) -> None:
+        """
+        Draws the board with the squares.
+        :return: None
+        """
         colors = [self.config.COLORS["WHITE"], self.config.COLORS["GRAY"]]
         pygame.draw.rect(
             self.screen,
@@ -42,6 +44,10 @@ class GameController:
                 )
 
     def draw_pieces(self) -> None:
+        """
+        Draws the pieces on the board.
+        :return: None
+        """
         for r in range(self.config.ROW):
             for c in range(self.config.COLUMN):
                 current_piece = self.map.board[r][c]
@@ -57,6 +63,12 @@ class GameController:
                     )
 
     def draw_possible_moves(self, moves, attack_moves) -> None:
+        """
+        Draws the possible moves and attack moves on the board.
+        :param moves: possible moves for the selected piece
+        :param attack_moves: attack moves for the selected piece
+        :return: None
+        """
         for move in moves:
             r, c = (move.y, move.x)
             move_surface = pygame.Surface(
@@ -86,6 +98,10 @@ class GameController:
             )
 
     def draw_checks(self) -> None:
+        """
+        Draws the checks on the board.
+        :return: None
+        """
         if self.map.check_white:
             r, c = self.map.white_king_position.y, self.map.white_king_position.x
         elif self.map.check_black:
@@ -105,6 +121,12 @@ class GameController:
         )
 
     def draw_message(self, color: Optional[str], message: Optional[str]) -> None:
+        """
+        Draws a message(when is checkmate or stalemate) on the board.
+        :param color: color of the player who won, None if it is a stalemate
+        :param message: message to be displayed(when is stalemate), None if it is a checkmate
+        :return: None
+        """
         if message is None:
             message = color[0].upper() + color[1:] + " won by checkmate"
         font = pygame.font.Font(None, 72)
@@ -118,6 +140,11 @@ class GameController:
         self.screen.blit(text, text_rect)
 
     def draw_promotion_options(self, position: Position) -> list[tuple[Any, Any]]:
+        """
+        Draws the promotion options on the board.
+        :param position: position where the promotion is happening
+        :return: list of tuples with the identifier of the piece and the rectangle where it is drawn
+        """
         c, r = position.x, position.y
         color, positions = ("b", [2, 3, 4, 5]) if r == 7 else ("w", [5, 4, 3, 2])
         r = -1.1 if r == 0 else 8.1
@@ -138,6 +165,13 @@ class GameController:
         return promoting_pieces
 
     def drag_piece(self, x: int, y: int, selected_piece: Piece) -> None:
+        """
+        Draws the selected piece on the board.
+        :param x: x position of the mouse
+        :param y: y position of the mouse
+        :param selected_piece: selected piece for the drag
+        :return: None
+        """
         if (
             0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
             and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
@@ -148,6 +182,10 @@ class GameController:
             )
 
     def draw_reset_button(self) -> None:
+        """
+        Draws the reset button on the board.
+        :return: None
+        """
         font = pygame.font.SysFont(None, 64)
         text = font.render("RESET", True, self.config.COLORS["BLACK"])
         text_rect = text.get_rect(
@@ -194,6 +232,10 @@ class GameController:
         self.screen.blit(text, text_rect)
 
     def draw_undo_button(self) -> None:
+        """
+        Draws the undo button on the board.
+        :return: None
+        """
         font = pygame.font.SysFont(None, 64)
         text = font.render("UNDO", True, self.config.COLORS["BLACK"])
         text_rect = text.get_rect(
@@ -240,6 +282,11 @@ class GameController:
         self.screen.blit(text, text_rect)
 
     def draw_material_diff(self) -> None:
+        """
+        Draws the material difference between the two players(chart on the left side of the board).
+        Will be updated to show stockfish evaluation in the future.
+        :return: None
+        """
         ratio = (self.map.black_captured_value + 10) / (
             self.map.black_captured_value + 20 + self.map.white_captured_value
         )
@@ -258,11 +305,19 @@ class GameController:
         pygame.draw.rect(self.screen, (255, 255, 255), (b_x, w_y, w_x_diff, w_y_diff))
 
     def draw_utils(self) -> None:
+        """
+        Draws the reset button, undo button and material difference chart on the board.
+        :return: None
+        """
         self.draw_reset_button()
         self.draw_undo_button()
         self.draw_material_diff()
 
-    def update_screen(self):
+    def update_screen(self) -> None:
+        """
+        Updates the screen with the new board state.
+        :return: None
+        """
         self.screen.fill(self.config.COLORS["BEIGE"])
         self.draw_board()
         self.draw_pieces()

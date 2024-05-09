@@ -32,20 +32,11 @@ class GameConfig:
     IMAGES = {}
 
     def load_images(self) -> None:
-        pieces = [
-            "wR",
-            "wN",
-            "wB",
-            "wQ",
-            "wK",
-            "wP",
-            "bR",
-            "bN",
-            "bB",
-            "bQ",
-            "bK",
-            "bP",
-        ]
+        """
+        Load the images of the pieces and store them in the IMAGES dictionary.
+        :return: None
+        """
+        pieces = ["wR", "wN", "wB", "wQ", "wK", "wP", "bR", "bN", "bB", "bQ", "bK", "bP"]
         for piece in pieces:
             self.IMAGES[piece] = pygame.transform.scale(
                 pygame.image.load("utils/images/" + piece + ".png"),

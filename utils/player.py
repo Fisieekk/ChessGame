@@ -7,13 +7,25 @@ class Player:
         self.king = True
 
     # Getter
-    def get_name(self):
+    def get_name(self) -> str:
+        """
+        Get the name of the player
+        :return: name of the player
+        """
         return self.name
 
-    def get_color(self):
+    def get_color(self) -> str:
+        """
+        Get the color of the player
+        :return: color of the player
+        """
         return self.color
 
     def get_own(self):
+        """
+        Get the own chess of the player
+        :return: own chess of the player
+        """
         return self.own
 
     def get_taken(self):
