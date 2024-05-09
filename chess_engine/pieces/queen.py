@@ -18,4 +18,4 @@ class Queen(Piece):
         return moves, attack_moves
 
     def get_identificator(self) -> str:
-        return self.color[0] + 'Q'
+        return self.color[0] + "Q"

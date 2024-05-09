@@ -27,12 +27,27 @@ class GameConfig:
         "LIGHT_GRAY": (169, 169, 169),
         "BEIGE": (255, 246, 231),
     }
-    LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"]
     FPS = 30
     IMAGES = {}
 
     def load_images(self) -> None:
-        pieces = ['wR', 'wN', 'wB', 'wQ', 'wK', 'wP', 'bR', 'bN', 'bB', 'bQ', 'bK', 'bP']
+        pieces = [
+            "wR",
+            "wN",
+            "wB",
+            "wQ",
+            "wK",
+            "wP",
+            "bR",
+            "bN",
+            "bB",
+            "bQ",
+            "bK",
+            "bP",
+        ]
         for piece in pieces:
-            self.IMAGES[piece] = pygame.transform.scale(pygame.image.load('utils/images/' + piece + '.png'),
-                                                        (self.SQUARE_SIZE, self.SQUARE_SIZE))
+            self.IMAGES[piece] = pygame.transform.scale(
+                pygame.image.load("utils/images/" + piece + ".png"),
+                (self.SQUARE_SIZE, self.SQUARE_SIZE),
+            )

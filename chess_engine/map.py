@@ -2,13 +2,12 @@ from typing import Optional
 
 from .piece import Piece
 from .position import Position
-
 from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
 
 
 class Map:
     def __init__(self, width, height):
-        self.curr_player = 'white'
+        self.curr_player = "white"
         self.history = []
         self.last_move = None
         self.turn = 1
@@ -24,34 +23,73 @@ class Map:
         self.height = height
         self.white_captured_value = 0
         self.black_captured_value = 0
-        self.weights = {'P': 1, 'B': 3, 'N': 3, 'R': 5, 'Q': 9}
+        self.weights = {"P": 1, "B": 3, "N": 3, "R": 5, "Q": 9}
         self.board = [
-            [Rook(0, 0, 'black'), Knight(0, 1, 'black'), Bishop(0, 2, 'black'), Queen(0, 3, 'black'),
-             King(0, 4, 'black'), Bishop(0, 5, 'black'), Knight(0, 6, 'black'), Rook(0, 7, 'black')],
-            [Pawn(1, 0, 'black'), Pawn(1, 1, 'black'), Pawn(1, 2, 'black'), Pawn(1, 3, 'black'),
-             Pawn(1, 4, 'black'), Pawn(1, 5, 'black'), Pawn(1, 6, 'black'), Pawn(1, 7, 'black')],
+            [
+                Rook(0, 0, "black"),
+                Knight(0, 1, "black"),
+                Bishop(0, 2, "black"),
+                Queen(0, 3, "black"),
+                King(0, 4, "black"),
+                Bishop(0, 5, "black"),
+                Knight(0, 6, "black"),
+                Rook(0, 7, "black"),
+            ],
+            [
+                Pawn(1, 0, "black"),
+                Pawn(1, 1, "black"),
+                Pawn(1, 2, "black"),
+                Pawn(1, 3, "black"),
+                Pawn(1, 4, "black"),
+                Pawn(1, 5, "black"),
+                Pawn(1, 6, "black"),
+                Pawn(1, 7, "black"),
+            ],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [Pawn(6, 0, 'white'), Pawn(6, 1, 'white'), Pawn(6, 2, 'white'), Pawn(6, 3, 'white'),
-             Pawn(6, 4, 'white'), Pawn(6, 5, 'white'), Pawn(6, 6, 'white'), Pawn(6, 7, 'white')],
-            [Rook(7, 0, 'white'), Knight(7, 1, 'white'), Bishop(7, 2, 'white'), Queen(7, 3, 'white'),
-             King(7, 4, 'white'), Bishop(7, 5, 'white'), Knight(7, 6, 'white'), Rook(7, 7, 'white')]
+            [
+                Pawn(6, 0, "white"),
+                Pawn(6, 1, "white"),
+                Pawn(6, 2, "white"),
+                Pawn(6, 3, "white"),
+                Pawn(6, 4, "white"),
+                Pawn(6, 5, "white"),
+                Pawn(6, 6, "white"),
+                Pawn(6, 7, "white"),
+            ],
+            [
+                Rook(7, 0, "white"),
+                Knight(7, 1, "white"),
+                Bishop(7, 2, "white"),
+                Queen(7, 3, "white"),
+                King(7, 4, "white"),
+                Bishop(7, 5, "white"),
+                Knight(7, 6, "white"),
+                Rook(7, 7, "white"),
+            ],
         ]
-
 
     def stalemate_test(self):
         self.board = [
-            [King(0, 0, 'black'), None, None, None, None, None, None, None],
+            [King(0, 0, "black"), None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [None, None, None, Queen(7, 3, 'white'),
-             King(7, 4, 'white'), None, None, None]
+            [
+                None,
+                None,
+                None,
+                Queen(7, 3, "white"),
+                King(7, 4, "white"),
+                None,
+                None,
+                None,
+            ],
         ]
 
     def move(self, start: Position, end: Position) -> None:
@@ -78,14 +116,23 @@ class Map:
                     self.board[0][0].move(Position(x=3, y=0))
                     self.board[0][3] = self.board[0][0]
                     self.board[0][0] = None
-            if piece.color == 'white':
+            if piece.color == "white":
                 self.white_king_moved = True
-            if piece.color == 'black':
+            if piece.color == "black":
                 self.black_king_moved = True
         piece.move(end)
         piece.last_move = self.turn
         self.board[end.y][end.x] = piece
-        self.history.append((piece, self.turn, piece.color, piece.type, (start.y, start.x), (end.y, end.x)))
+        self.history.append(
+            (
+                piece,
+                self.turn,
+                piece.color,
+                piece.type,
+                (start.y, start.x),
+                (end.y, end.x),
+            )
+        )
         self.last_move = (start, end, piece)
         if type(piece) == Pawn and (end.y == 0 or end.y == 7):
             self.promoting_piece = piece
@@ -111,12 +158,16 @@ class Map:
             for j in range(8):
                 if self.board[i][j] is not None and self.board[i][j].color == color:
                     moves, attack_moves = self.board[i][j].can_move(self)
-                    moves, attack_moves = self.preventer(moves, attack_moves, self.board[i][j])
+                    moves, attack_moves = self.preventer(
+                        moves, attack_moves, self.board[i][j]
+                    )
                     possible_moves += attack_moves
                     possible_moves += moves
         return possible_moves
 
-    def preventer(self, moves: list, attack_moves: list, piece: Piece) -> tuple[list, list]:
+    def preventer(
+        self, moves: list, attack_moves: list, piece: Piece
+    ) -> tuple[list, list]:
         old_position = piece.position
         self.board[old_position.y][old_position.x] = None
         color = piece.color
@@ -143,7 +194,10 @@ class Map:
                     self.black_king_position = old_position
         for move in attack_moves:
             new_position = move
-            temp, self.board[new_position.y][new_position.x] = self.board[new_position.y][new_position.x], piece
+            temp, self.board[new_position.y][new_position.x] = (
+                self.board[new_position.y][new_position.x],
+                piece,
+            )
             if type(piece) == King:
                 if color == "white":
                     self.white_king_position = [new_position.y, new_position.x]
@@ -175,17 +229,23 @@ class Map:
         print(color)
         print(self.all_possible_attacks("white"))
         print(self.black_king_position)
-        if color == "white" and self.white_king_position in self.all_possible_attacks("black"):
+        if color == "white" and self.white_king_position in self.all_possible_attacks(
+            "black"
+        ):
             self.check_white = True
             self.check_black = False
-        elif color == 'black' and self.black_king_position in self.all_possible_attacks("white"):
+        elif color == "black" and self.black_king_position in self.all_possible_attacks(
+            "white"
+        ):
             self.check_white = False
             self.check_black = True
         else:
             self.check_white = False
             self.check_black = False
 
-    def castle(self, moves: list, attack_moves: list, piece: Piece) -> tuple[list, list]:
+    def castle(
+        self, moves: list, attack_moves: list, piece: Piece
+    ) -> tuple[list, list]:
         if piece.last_move is not None:
             return moves, attack_moves
         if piece.color == "white":
@@ -195,7 +255,11 @@ class Map:
                         moves.append(Position(x=6, y=7))
             if self.board[7][0] is not None:
                 if self.board[7][0].last_move is None:
-                    if self.board[7][1] is None and self.board[7][2] is None and self.board[7][3] is None:
+                    if (
+                        self.board[7][1] is None
+                        and self.board[7][2] is None
+                        and self.board[7][3] is None
+                    ):
                         moves.append(Position(x=2, y=7))
         else:
             if self.board[0][7] is not None:
@@ -204,7 +268,11 @@ class Map:
                         moves.append(Position(x=6, y=0))
             if self.board[0][0] is not None:
                 if self.board[0][0].last_move is None:
-                    if self.board[0][1] is None and self.board[0][2] is None and self.board[0][3] is None:
+                    if (
+                        self.board[0][1] is None
+                        and self.board[0][2] is None
+                        and self.board[0][3] is None
+                    ):
                         moves.append(Position(x=2, y=0))
 
         return moves, attack_moves
@@ -225,22 +293,26 @@ class Map:
         return False
 
     def evaluate_captured_piece(self, captured_piece: Piece) -> None:
-        if captured_piece.get_identificator()[-1] == 'K':
+        if captured_piece.get_identificator()[-1] == "K":
             return
-        if captured_piece.color == 'white':
-            self.black_captured_value += self.weights[captured_piece.get_identificator()[1]]
+        if captured_piece.color == "white":
+            self.black_captured_value += self.weights[
+                captured_piece.get_identificator()[1]
+            ]
         else:
-            self.white_captured_value += self.weights[captured_piece.get_identificator()[1]]
+            self.white_captured_value += self.weights[
+                captured_piece.get_identificator()[1]
+            ]
 
     def change_piece(self, identifier: str) -> None:
-        color = 'white' if identifier[0] == 'w' else 'black'
+        color = "white" if identifier[0] == "w" else "black"
         position = self.promoting_piece.position
         row, col = position.y, position.x
-        if identifier[1] == 'Q':
+        if identifier[1] == "Q":
             self.board[row][col] = Queen(row, col, color)
-        elif identifier[1] == 'N':
+        elif identifier[1] == "N":
             self.board[row][col] = Knight(row, col, color)
-        elif identifier[1] == 'R':
+        elif identifier[1] == "R":
             self.board[row][col] = Rook(row, col, color)
         else:
             self.board[row][col] = Bishop(row, col, color)

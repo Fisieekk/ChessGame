@@ -18,9 +18,12 @@ class Knight(Piece):
                     if map.board[new_position.y][new_position.x] is None:
                         moves.append(new_position)
                     else:
-                        if map.board[new_position.y][new_position.x].color != self.color:
+                        if (
+                            map.board[new_position.y][new_position.x].color
+                            != self.color
+                        ):
                             attack_moves.append(new_position)
         return moves, attack_moves
 
     def get_identificator(self) -> str:
-        return self.color[0] + 'N'
+        return self.color[0] + "N"

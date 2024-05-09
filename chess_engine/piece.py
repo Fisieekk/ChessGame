@@ -23,14 +23,24 @@ class Piece:
         moves = []
         attack_moves = []
         for move in output:
-            new_position = Position(x=self.position.x + move[1], y=self.position.y + move[0])
-            while new_position.in_board() and map.board[new_position.y][new_position.x] is None:
+            new_position = Position(
+                x=self.position.x + move[1], y=self.position.y + move[0]
+            )
+            while (
+                new_position.in_board()
+                and map.board[new_position.y][new_position.x] is None
+            ):
                 moves.append(new_position)
-                new_position=Position(x=new_position.x + move[1], y=new_position.y + move[0])
+                new_position = Position(
+                    x=new_position.x + move[1], y=new_position.y + move[0]
+                )
 
-            if 8 > new_position.x >= 0 and 8 > new_position.y >= 0 and map.board[new_position.y][
-                new_position.x] is not None and \
-                    map.board[new_position.y][new_position.x].color != self.color:
+            if (
+                8 > new_position.x >= 0
+                and 8 > new_position.y >= 0
+                and map.board[new_position.y][new_position.x] is not None
+                and map.board[new_position.y][new_position.x].color != self.color
+            ):
                 attack_moves.append(new_position)
 
         return moves, attack_moves

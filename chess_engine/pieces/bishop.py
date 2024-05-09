@@ -15,4 +15,4 @@ class Bishop(Piece):
         return self.create_moves(map, output)
 
     def get_identificator(self) -> str:
-        return self.color[0] + 'B'
+        return self.color[0] + "B"

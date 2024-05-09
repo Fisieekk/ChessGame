@@ -15,4 +15,4 @@ class Rook(Piece):
         return self.create_moves(board, output)
 
     def get_identificator(self) -> str:
-        return self.color[0] + 'R'
+        return self.color[0] + "R"

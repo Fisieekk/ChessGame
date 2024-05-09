@@ -2,10 +2,11 @@ class Player:
     def __init__(self, name, color):
         self.name = name
         self.color = color
-        self.own=[]
-        self.taken=[]
+        self.own = []
+        self.taken = []
         self.king = True
-#Getter
+
+    # Getter
     def get_name(self):
         return self.name
 
@@ -21,7 +22,7 @@ class Player:
     def get_king(self):
         return self.king
 
-#Setter
+    # Setter
     def set_own(self, own):
         self.own = own
 
@@ -33,8 +34,8 @@ class Player:
 
     def __str__(self):
         return f"Name: {self.name}, Color: {self.color}, Own: {self.own}, Taken: {self.taken}, King: {self.king}"
-    
-# Remove
-    def remove_chess(self,chess):
+
+    # Remove
+    def remove_chess(self, chess):
         self.own.remove(chess)
         self.taken.append(chess)

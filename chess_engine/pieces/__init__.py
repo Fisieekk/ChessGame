@@ -4,4 +4,3 @@ from .bishop import Bishop
 from .queen import Queen
 from .king import King
 from .pawn import Pawn
-
