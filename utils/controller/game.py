@@ -26,7 +26,7 @@ class Game:
         self.stalemate = False
         self.promoting_pieces = None
         self.config.load_images()
-        self.stockfish_path=r"C:\Users\006ma\PycharmProjects\ChessGame\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
+        self.stockfish_path=r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
         self.engine =Stockfish(path=self.stockfish_path)
 
     def reinitialize(self) -> None:
