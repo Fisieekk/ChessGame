@@ -75,7 +75,7 @@ class Map:
 
     def stalemate_test(self):
         """
-        Method to simplify the stalemate test. 
+        Method to simplify the stalemate test.
         :return: none
         """
         self.board = [
@@ -101,12 +101,13 @@ class Map:
     def move(self, start: Position, end: Position) -> None:
         """
         Method to move a piece from start to end position.
-        :param start: start position of piece 
+        :param start: start position of piece
         :param end:  end position of piece
         :return None
         """
         piece, self.board[start.y][start.x] = self.board[start.y][start.x], None
         if type(piece) == King:
+            # if Castle
             if piece.color == "white" and not self.white_king_moved:
                 self.white_king_position = end
                 if (end.y, end.x) == (7, 6):
@@ -117,7 +118,6 @@ class Map:
                     self.board[7][0].move(Position(x=3, y=7))
                     self.board[7][3] = self.board[7][0]
                     self.board[7][0] = None
-
             elif piece.color == "black" and not self.black_king_moved:
                 self.black_king_position = end
                 if (end.y, end.x) == (0, 6):
@@ -129,8 +129,10 @@ class Map:
                     self.board[0][3] = self.board[0][0]
                     self.board[0][0] = None
             if piece.color == "white":
+                self.white_king_position = end
                 self.white_king_moved = True
             if piece.color == "black":
+                self.black_king_position = end
                 self.black_king_moved = True
         piece.move(end)
         piece.last_move = self.turn
@@ -235,9 +237,9 @@ class Map:
             )
             if type(piece) == King:
                 if color == "white":
-                    self.white_king_position = [new_position.y, new_position.x]
+                    self.white_king_position = new_position
                 else:
-                    self.black_king_position = [new_position.y, new_position.x]
+                    self.black_king_position = new_position
             if color == "white":
                 if self.white_king_position in self.all_possible_attacks("black"):
                     moves_to_remove.append(move)
@@ -265,7 +267,6 @@ class Map:
         :param color: color of the player
         :return: None
         """
-        print("here")
         print(color)
         print(self.all_possible_attacks("white"))
         print(self.black_king_position)

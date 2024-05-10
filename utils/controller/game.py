@@ -44,7 +44,7 @@ class Game:
         self.stalemate = False
         self.promoting_pieces = None
 
-    def handle_promotion(self, x: int, y: int) -> None:
+    def handle_promotion(self, x: int, y: int) -> bool:
         """
         Handle the promotion of a pawn
         :param x: x coordinate of the mouse
@@ -54,6 +54,8 @@ class Game:
         for identifier, current_position in self.promoting_pieces:
             if current_position.collidepoint(x, y):
                 self.map.change_piece(identifier)
+                return True
+        return False
 
     def select_piece(self, x: int, y: int) -> None:
         """
@@ -104,6 +106,8 @@ class Game:
             type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
             and new_position in self.attack_moves
             and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
+            and self.map.board[self.original_pos.y][new_position.x].color
+            != self.map.curr_player
         )
 
     def en_passant_move(self, new_position: Position) -> None:
@@ -181,9 +185,9 @@ class Game:
                     self.map.curr_player = (
                         "white" if self.map.curr_player == "black" else "black"
                     )
-                    self.map.check(self.map.curr_player)
-                    self.mate = self.map.calculate_mate()
-                    self.stalemate = self.map.calculate_stalemate()
+        self.map.check(self.map.curr_player)
+        self.mate = self.map.calculate_mate()
+        self.stalemate = self.map.calculate_stalemate()
 
         self.selected_piece = None
         self.moves, self.attack_moves = None, None
@@ -244,6 +248,18 @@ class Game:
                             x, y = pygame.mouse.get_pos()
                             self.choose_type_of_move(x, y)
 
+            if self.map.promoting_piece:
+                promoting_piece_position = self.map.promoting_piece.position
+                self.promoting_pieces = self.controller.draw_promotion_options(
+                    promoting_piece_position
+                )
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = pygame.mouse.get_pos()
+                    if self.handle_promotion(x, y):
+                        self.map.promoting_piece = None
+                        self.map.check(self.map.curr_player)
+                        self.mate = self.map.calculate_mate()
+                        self.stalemate = self.map.calculate_stalemate()
             if self.mate:
                 self.controller.draw_message(
                     "white" if self.map.curr_player == "black" else "black", None
@@ -252,16 +268,7 @@ class Game:
             elif self.stalemate:
                 self.controller.draw_message(None, "Stalemate")
 
-            if self.map.promoting_piece:
-                self.promoting_pieces = self.controller.draw_promotion_options(
-                    self.map.promoting_piece.position
-                )
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = pygame.mouse.get_pos()
-                    if self.handle_promotion(x, y):
-                        self.map.promoting_piece = None
-
-                    # dragging piece
+                # dragging piece
             if self.mouse_down and self.selected_piece:
                 x, y = pygame.mouse.get_pos()
                 self.controller.drag_piece(x, y, self.selected_piece)

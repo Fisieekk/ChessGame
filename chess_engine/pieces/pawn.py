@@ -49,7 +49,7 @@ class Pawn(Piece):
         return moves, attack_moves
 
     def en_passant_verification(
-            self, map, new_position: Position, position_change: int
+        self, map, new_position: Position, position_change: int
     ) -> bool:
         """
         Method to verify if the en passant move is possible.
@@ -58,12 +58,12 @@ class Pawn(Piece):
         :param position_change: change of the position of the piece when en passant move is possible
         :return: True if the en passant move is possible, False otherwise
         """
-        print(map.last_move, "LAST")
         return (
             self.position.y == map.last_move[1].y
             and new_position.y == map.last_move[1].y + position_change
             and new_position.x == map.last_move[1].x
             and type(map.last_move[2]) == Pawn
+            and map.last_move[2].color != self.color
             and abs(map.last_move[1].y - map.last_move[0].y) == 2
         )
 
