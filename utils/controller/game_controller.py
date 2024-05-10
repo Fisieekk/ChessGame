@@ -173,8 +173,8 @@ class GameController:
         :return: None
         """
         if (
-            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             self.screen.blit(
                 self.config.IMAGES[selected_piece.get_identificator()],
@@ -281,15 +281,14 @@ class GameController:
         )
         self.screen.blit(text, text_rect)
 
-    def draw_material_diff(self) -> None:
+    def draw_material_diff(self, evaluation: float) -> None:
         """
         Draws the material difference between the two players(chart on the left side of the board).
         Will be updated to show stockfish evaluation in the future.
+        :param evaluation: evaluation of the position, positive if white is winning, negative if black is winning
         :return: None
         """
-        ratio = (self.map.black_captured_value + 10) / (
-            self.map.black_captured_value + 20 + self.map.white_captured_value
-        )
+        ratio = (-evaluation/100 + 10) / 20
         b_x, b_y = (
             self.config.X_OFFSET - 2 * self.config.MATERIAL_CHART_WIDTH,
             self.config.Y_OFFSET,
@@ -304,21 +303,22 @@ class GameController:
 
         pygame.draw.rect(self.screen, (255, 255, 255), (b_x, w_y, w_x_diff, w_y_diff))
 
-    def draw_utils(self) -> None:
+    def draw_utils(self, evaluation: float) -> None:
         """
         Draws the reset button, undo button and material difference chart on the board.
         :return: None
         """
         self.draw_reset_button()
         self.draw_undo_button()
-        self.draw_material_diff()
+        self.draw_material_diff(evaluation)
 
-    def update_screen(self) -> None:
+    def update_screen(self, evaluation: float) -> None:
         """
         Updates the screen with the new board state.
+        :param evaluation: evaluation of the position, positive if white is winning, negative if black is winning
         :return: None
         """
         self.screen.fill(self.config.COLORS["BEIGE"])
         self.draw_board()
         self.draw_pieces()
-        self.draw_utils()
+        self.draw_utils(evaluation)

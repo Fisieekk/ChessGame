@@ -1,7 +1,10 @@
 import pygame
+from chess import engine
+
 from chess_engine import *
 from .game_config import GameConfig
 from .game_controller import GameController
+from stockfish import Stockfish
 
 
 class Game:
@@ -23,6 +26,8 @@ class Game:
         self.stalemate = False
         self.promoting_pieces = None
         self.config.load_images()
+        self.stockfish_path=r"C:\Users\006ma\PycharmProjects\ChessGame\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
+        self.engine =Stockfish(path=self.stockfish_path)
 
     def reinitialize(self) -> None:
         """
@@ -43,6 +48,7 @@ class Game:
         self.mate = False
         self.stalemate = False
         self.promoting_pieces = None
+        self.engine = Stockfish(path=self.stockfish_path)
 
     def handle_promotion(self, x: int, y: int) -> bool:
         """
@@ -93,8 +99,8 @@ class Game:
             self.moves, self.attack_moves = self.map.preventer(
                 self.moves, self.attack_moves, self.selected_piece
             )
-        print("Moves: ", self.moves)
-        print("Attack moves: ", self.attack_moves)
+        # print("Moves: ", self.moves)
+        #print("Attack moves: ", self.attack_moves)
 
     def en_passant_verification(self, new_position: Position) -> bool:
         """
@@ -142,6 +148,7 @@ class Game:
 
         self.map.move(self.original_pos, Position(x=new_position.x, y=new_position.y))
 
+
     def choose_type_of_move(self, x: int, y: int) -> None:
         """
         Choose the type of move to make
@@ -166,19 +173,16 @@ class Game:
                         self.en_passant_move(new_position)
                     else:
                         self.move(new_position)
-                    print("Captured value: ")
-                    print(
+                        """
+                        print("Captured value: ")
+                        print(
                         "White: ",
                         self.map.white_captured_value,
                         " Black: ",
                         self.map.black_captured_value,
                     )
-                    move_id = (
-                        self.selected_piece.get_identificator()[1]
-                        + self.config.LETTERS[new_position.x]
-                        + str(8 - new_position.y)
-                    )
-                    self.map.history.append(move_id)
+                        """
+
                     self.selected_piece.last_move = (
                         self.map.history[-1] if self.map.history else None
                     )
@@ -219,34 +223,50 @@ class Game:
 
         timer = pygame.time.Clock()
         pygame.display.set_caption("Chess App")
+        self.engine.set_position([])
+        evaluation = self.engine.get_evaluation()
 
         while self.running:
             timer.tick(self.config.FPS)
-            self.controller.update_screen()
+
+            if self.fps_counter % 30 == 0: # every 30 frames to not kill the CPU
+                evaluation = self.engine.get_evaluation()
+            self.controller.update_screen(evaluation['value'])
             self.fps_counter += 1
+            if self.map.curr_player == "black":
+                last_move = self.map.history[-1]
+                self.engine.make_moves_from_current_position([last_move])
+                result = self.engine.get_best_move()
+                self.map.make_engine_move(result)
+                self.engine.make_moves_from_current_position([result])
+                self.map.check(self.map.curr_player)
+                self.mate= self.map.calculate_mate()
+                self.stalemate = self.map.calculate_stalemate()
+
             for event in pygame.event.get():
                 # quit
                 if event.type == pygame.QUIT:
                     self.running = False
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = pygame.mouse.get_pos()
-                    self.reset_clicked(x, y)
+                if self.map.curr_player == "white":
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        x, y = pygame.mouse.get_pos()
+                        self.reset_clicked(x, y)
 
-                # if game not ended
-                if not self.mate and not self.stalemate:
-                    # and we don't have a promotion
-                    if not self.map.promoting_piece:
-                        # selecting a piece
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            x, y = pygame.mouse.get_pos()
-                            self.select_piece(x, y)
-                            self.update_possible_moves()
+                    # if game not ended
+                    if not self.mate and not self.stalemate:
+                        # and we don't have a promotion
+                        if not self.map.promoting_piece:
+                            # selecting a piece
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                x, y = pygame.mouse.get_pos()
+                                self.select_piece(x, y)
+                                self.update_possible_moves()
 
-                        # if we have selected piece we can make a move
-                        if event.type == pygame.MOUSEBUTTONUP and self.selected_piece:
-                            x, y = pygame.mouse.get_pos()
-                            self.choose_type_of_move(x, y)
+                            # if we have selected piece we can make a move
+                            if event.type == pygame.MOUSEBUTTONUP and self.selected_piece:
+                                x, y = pygame.mouse.get_pos()
+                                self.choose_type_of_move(x, y)
 
             if self.map.promoting_piece:
                 promoting_piece_position = self.map.promoting_piece.position
@@ -278,6 +298,9 @@ class Game:
 
             if self.map.check_white or self.map.check_black:
                 self.controller.draw_checks()
+
+            if(self.fps_counter % 100 == 0):
+                print(self.map.history)
 
             pygame.display.flip()
 

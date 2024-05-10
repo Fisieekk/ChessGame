@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .piece import Piece
 from .position import Position
 from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
@@ -98,6 +100,20 @@ class Map:
             ],
         ]
 
+    def move_to_uci(self, move: tuple[Position, Position]) -> str:
+        """
+        Method to convert move to UCI notation.
+        :param move: move to be converted
+        :return: UCI notation of the move
+        """
+        start, end = move
+        return (
+                chr(start.x + 97)
+                + str(8 - start.y)
+                + chr(end.x + 97)
+                + str(8 - end.y)
+        )
+
     def move(self, start: Position, end: Position) -> None:
         """
         Method to move a piece from start to end position.
@@ -106,28 +122,34 @@ class Map:
         :return None
         """
         piece, self.board[start.y][start.x] = self.board[start.y][start.x], None
+        castle_uci = ""
         if type(piece) == King:
             # if Castle
+
             if piece.color == "white" and not self.white_king_moved:
                 self.white_king_position = end
                 if (end.y, end.x) == (7, 6):
                     self.board[7][7].move(Position(x=5, y=7))
                     self.board[7][5] = self.board[7][7]
                     self.board[7][7] = None
+                    castle_uci = "e1g1"
                 elif (end.y, end.x) == (7, 2):
                     self.board[7][0].move(Position(x=3, y=7))
                     self.board[7][3] = self.board[7][0]
                     self.board[7][0] = None
+                    castle_uci = "e1c1"
             elif piece.color == "black" and not self.black_king_moved:
                 self.black_king_position = end
                 if (end.y, end.x) == (0, 6):
                     self.board[0][7].move(Position(x=5, y=0))
                     self.board[0][5] = self.board[0][7]
                     self.board[0][7] = None
+                    castle_uci = "e8g8"
                 elif (end.y, end.x) == (0, 2):
                     self.board[0][0].move(Position(x=3, y=0))
                     self.board[0][3] = self.board[0][0]
                     self.board[0][0] = None
+                    castle_uci = "e8c8"
             if piece.color == "white":
                 self.white_king_position = end
                 self.white_king_moved = True
@@ -137,19 +159,10 @@ class Map:
         piece.move(end)
         piece.last_move = self.turn
         self.board[end.y][end.x] = piece
-        self.history.append(
-            (
-                piece,
-                self.turn,
-                piece.color,
-                piece.type,
-                (start.y, start.x),
-                (end.y, end.x),
-            )
-        )
         self.last_move = (start, end, piece)
         if type(piece) == Pawn and (end.y == 0 or end.y == 7):
             self.promoting_piece = piece
+        self.history.append(self.move_to_uci((start, end)) if castle_uci == "" else castle_uci)
         self.turn += 1
 
     def en_passant_move(self, start: Position, end: Position) -> None:
@@ -159,7 +172,6 @@ class Map:
         :param end: end position of piece
         :return None
         """
-        print("en passant")
         self.board[start.y][end.x] = None
         self.move(start, end)
 
@@ -196,7 +208,7 @@ class Map:
         return possible_moves
 
     def preventer(
-        self, moves: list, attack_moves: list, piece: Piece
+            self, moves: list, attack_moves: list, piece: Piece
     ) -> tuple[list, list]:
         """
         Method to prevent a move that is illegal.
@@ -267,16 +279,19 @@ class Map:
         :param color: color of the player
         :return: None
         """
+        """
         print(color)
         print(self.all_possible_attacks("white"))
         print(self.black_king_position)
+        """
+
         if color == "white" and self.white_king_position in self.all_possible_attacks(
-            "black"
+                "black"
         ):
             self.check_white = True
             self.check_black = False
         elif color == "black" and self.black_king_position in self.all_possible_attacks(
-            "white"
+                "white"
         ):
             self.check_white = False
             self.check_black = True
@@ -285,7 +300,7 @@ class Map:
             self.check_black = False
 
     def castle(
-        self, moves: list, attack_moves: list, piece: Piece
+            self, moves: list, attack_moves: list, piece: Piece
     ) -> tuple[list, list]:
         """
         Method to add a castle to possible moves.
@@ -304,9 +319,9 @@ class Map:
             if self.board[7][0] is not None:
                 if self.board[7][0].last_move is None:
                     if (
-                        self.board[7][1] is None
-                        and self.board[7][2] is None
-                        and self.board[7][3] is None
+                            self.board[7][1] is None
+                            and self.board[7][2] is None
+                            and self.board[7][3] is None
                     ):
                         moves.append(Position(x=2, y=7))
         else:
@@ -317,9 +332,9 @@ class Map:
             if self.board[0][0] is not None:
                 if self.board[0][0].last_move is None:
                     if (
-                        self.board[0][1] is None
-                        and self.board[0][2] is None
-                        and self.board[0][3] is None
+                            self.board[0][1] is None
+                            and self.board[0][2] is None
+                            and self.board[0][3] is None
                     ):
                         moves.append(Position(x=2, y=0))
 
@@ -365,24 +380,43 @@ class Map:
                 captured_piece.get_identificator()[1]
             ]
 
-    def change_piece(self, identifier: str) -> None:
+    def change_piece(self, position: Optional[Position], identifier: str) -> None:
         """
         Method to change a piece after promotion.
+        :param position: position of the piece to be changed
         :param identifier: identifier of the piece to be placed on the board
         :return: None
         """
         color = "white" if identifier[0] == "w" else "black"
-        position = self.promoting_piece.position
+        if position is None:
+            position = self.promoting_piece.position
         row, col = position.y, position.x
         if identifier[1] == "Q":
             self.board[row][col] = Queen(row, col, color)
+            self.history[-1] += identifier[1].lower()
         elif identifier[1] == "N":
             self.board[row][col] = Knight(row, col, color)
+            self.history[-1] += identifier[1].lower()
         elif identifier[1] == "R":
             self.board[row][col] = Rook(row, col, color)
+            self.history[-1] += identifier[1].lower()
         else:
             self.board[row][col] = Bishop(row, col, color)
+            self.history[-1] += identifier[1].lower()
 
         self.promoting_piece = None
 
-    # def add_move_to_history(self, piece: Piece, old_position: Position, special_move: Optional[str]):
+    def make_engine_move(self, move: str) -> None:
+        """
+        Method to make a move for the engine.
+        For now engine will be playing only as black.
+        :param move: move to be made
+        :return: None
+        """
+        start = Position(x=ord(move[0]) - 97, y=8 - int(move[1]))
+        end = Position(x=ord(move[2]) - 97, y=8 - int(move[3]))
+        self.move(start, end)
+        if len(move) == 5:
+            self.change_piece(end, 'b'+move[4].upper())
+            self.history[-1] += move[4].lower()
+        self.curr_player = "white"
