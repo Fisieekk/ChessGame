@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, List
 import pygame
 from chess_engine import Map, Position, Piece
 from utils.controller.game_config import GameConfig
@@ -6,6 +6,7 @@ from utils.controller.game_config import GameConfig
 
 class GameController:
     def __init__(self, config: GameConfig, game_map: Map):
+        pygame.init()
         self.map = game_map
         self.config = config
         self.screen = pygame.display.set_mode(
@@ -188,20 +189,13 @@ class GameController:
         """
         font = pygame.font.SysFont(None, 64)
         text = font.render("RESET", True, self.config.COLORS["BLACK"])
+        x, y, width, height = self.config.RESET_BUTTON
         text_rect = text.get_rect(
-            center=(
-                self.config.START_BUTTON_X + self.config.BUTTON_WIDTH // 2,
-                self.config.START_BUTTON_Y + self.config.BUTTON_HEIGHT // 2,
-            )
+            center=(x + width // 2, y + height // 2),
         )
 
         mouse_pos = pygame.mouse.get_pos()
-        is_mouse_over = pygame.Rect(
-            self.config.START_BUTTON_X,
-            self.config.START_BUTTON_Y,
-            self.config.BUTTON_WIDTH,
-            self.config.BUTTON_HEIGHT,
-        ).collidepoint(mouse_pos)
+        is_mouse_over = pygame.Rect(self.config.RESET_BUTTON).collidepoint(mouse_pos)
 
         if is_mouse_over and pygame.mouse.get_pressed()[0]:
             button_color = self.config.COLORS["GRAY"]
@@ -211,75 +205,56 @@ class GameController:
         pygame.draw.rect(
             self.screen,
             button_color,
-            (
-                self.config.START_BUTTON_X,
-                self.config.START_BUTTON_Y,
-                self.config.BUTTON_WIDTH,
-                self.config.BUTTON_HEIGHT,
-            ),
+            self.config.RESET_BUTTON,
+            border_radius=self.config.BORDER_RADIUS
         )
         pygame.draw.rect(
             self.screen,
             self.config.COLORS["BLACK"],
-            (
-                self.config.START_BUTTON_X,
-                self.config.START_BUTTON_Y,
-                self.config.BUTTON_WIDTH,
-                self.config.BUTTON_HEIGHT,
-            ),
-            2,
-        )
+            self.config.RESET_BUTTON,
+            border_radius=self.config.BORDER_RADIUS,
+            width=2)
         self.screen.blit(text, text_rect)
 
-    def draw_undo_button(self) -> None:
+    def draw_utiles_rect(self) -> None:
         """
-        Draws the undo button on the board.
+        Draws the rectangle for the utils on the board.
         :return: None
         """
-        font = pygame.font.SysFont(None, 64)
-        text = font.render("UNDO", True, self.config.COLORS["BLACK"])
-        text_rect = text.get_rect(
-            center=(
-                self.config.UNDO_BUTTON_X + self.config.BUTTON_WIDTH // 2,
-                self.config.UNDO_BUTTON_Y + self.config.BUTTON_HEIGHT // 2,
-            )
-        )
-
-        mouse_pos = pygame.mouse.get_pos()
-        is_mouse_over = pygame.Rect(
-            self.config.UNDO_BUTTON_X,
-            self.config.UNDO_BUTTON_Y,
-            self.config.BUTTON_WIDTH,
-            self.config.BUTTON_HEIGHT,
-        ).collidepoint(mouse_pos)
-
-        if is_mouse_over and pygame.mouse.get_pressed()[0]:
-            button_color = self.config.COLORS["GRAY"]
-        else:
-            button_color = self.config.COLORS["LIGHT_GRAY"]
-
         pygame.draw.rect(
             self.screen,
-            button_color,
-            (
-                self.config.UNDO_BUTTON_X,
-                self.config.UNDO_BUTTON_Y,
-                self.config.BUTTON_WIDTH,
-                self.config.BUTTON_HEIGHT,
-            ),
+            self.config.COLORS["MENU_BACKGROUND"],
+            self.config.UTILS_RECTANGLE,
+            border_radius=self.config.BORDER_RADIUS
         )
-        pygame.draw.rect(
-            self.screen,
-            self.config.COLORS["BLACK"],
-            (
-                self.config.UNDO_BUTTON_X,
-                self.config.UNDO_BUTTON_Y,
-                self.config.BUTTON_WIDTH,
-                self.config.BUTTON_HEIGHT,
-            ),
-            2,
-        )
-        self.screen.blit(text, text_rect)
+        white_moves, black_moves, last_move_num = self.map.get_eight_last_moves()
+        self.draw_last_moves_numbers(last_move_num)
+        self.draw_last_white_moves(white_moves)
+        self.draw_last_black_moves(black_moves)
+
+    # TODO implement the following methods
+    def draw_last_moves_numbers(self, last_move_num: int) -> None:
+        """
+        Draws the last moves numbers on the board.
+        :return: None
+        """
+        pass
+
+    def draw_last_white_moves(self, moves: List[str]) -> None:
+        """
+        Draws the last white moves on the board.
+        :param moves: list of the last white moves
+        :return: None
+        """
+        pass
+
+    def draw_last_black_moves(self, moves: List[str]) -> None:
+        """
+        Draws the last black moves on the board.
+        :param moves: list of the last black moves
+        :return: None
+        """
+        pass
 
     def draw_material_diff(self, evaluation: float) -> None:
         """
@@ -288,7 +263,7 @@ class GameController:
         :param evaluation: evaluation of the position, positive if white is winning, negative if black is winning
         :return: None
         """
-        ratio = (-evaluation/100 + 10) / 20
+        ratio = (-evaluation / 100 + 10) / 20
         b_x, b_y = (
             self.config.X_OFFSET - 2 * self.config.MATERIAL_CHART_WIDTH,
             self.config.Y_OFFSET,
@@ -303,13 +278,19 @@ class GameController:
 
         pygame.draw.rect(self.screen, (255, 255, 255), (b_x, w_y, w_x_diff, w_y_diff))
 
+        text = self.config.EVAL_FONT.render(str(evaluation/100), True, self.config.COLORS["WHITE"])
+        text_rect = text.get_rect(
+            center=(b_x + b_x_diff//2, self.config.Y_OFFSET+self.config.BOARD_SIZE + 25),
+        )
+        self.screen.blit(text, text_rect)
+
     def draw_utils(self, evaluation: float) -> None:
         """
         Draws the reset button, undo button and material difference chart on the board.
         :return: None
         """
         self.draw_reset_button()
-        self.draw_undo_button()
+        self.draw_utiles_rect()
         self.draw_material_diff(evaluation)
 
     def update_screen(self, evaluation: float) -> None:
@@ -318,7 +299,7 @@ class GameController:
         :param evaluation: evaluation of the position, positive if white is winning, negative if black is winning
         :return: None
         """
-        self.screen.fill(self.config.COLORS["BEIGE"])
+        self.screen.fill(self.config.COLORS["APP_BACKGROUND"])
         self.draw_board()
         self.draw_pieces()
         self.draw_utils(evaluation)

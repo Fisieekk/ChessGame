@@ -417,6 +417,23 @@ class Map:
         end = Position(x=ord(move[2]) - 97, y=8 - int(move[3]))
         self.move(start, end)
         if len(move) == 5:
-            self.change_piece(end, 'b'+move[4].upper())
+            self.change_piece(end, 'b' + move[4].upper())
             self.history[-1] += move[4].lower()
         self.curr_player = "white"
+
+    def get_eight_last_moves(self) -> tuple[list, list, int]:
+        """
+        Method to get the last eight moves.
+        :return: tuple of two lists of moves and the number of moves
+        """
+        black_moves = []
+        white_moves = []
+        moves_number = len(self.history) // 2
+        for i in range(len(self.history) - 1, -1, -1):
+            if i % 2 == 0:
+                black_moves.append(self.history[i])
+            else:
+                white_moves.append(self.history[i])
+            if len(black_moves) == 8 and len(white_moves) == 8:
+                break
+        return white_moves, black_moves, moves_number

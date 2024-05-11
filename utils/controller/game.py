@@ -6,10 +6,13 @@ from .game_config import GameConfig
 from .game_controller import GameController
 from stockfish import Stockfish
 
+from ..presenter.menu import Menu
+
 
 class Game:
     def __init__(self):
         self.config = GameConfig()
+        self.menu = Menu()
         self.map = Map(8, 8)
         self.controller = GameController(self.config, self.map)
         self.history = []
@@ -26,8 +29,9 @@ class Game:
         self.stalemate = False
         self.promoting_pieces = None
         self.config.load_images()
-        self.stockfish_path=r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
-        self.engine =Stockfish(path=self.stockfish_path)
+        self.stockfish_path = r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
+        self.engine = Stockfish(path=self.stockfish_path)
+        self.game_type = None
 
     def reinitialize(self) -> None:
         """
@@ -59,7 +63,10 @@ class Game:
         """
         for identifier, current_position in self.promoting_pieces:
             if current_position.collidepoint(x, y):
-                self.map.change_piece(identifier)
+                new_position = Position(x=0,y=0)
+                new_position.from_string_to_map(self.map.history[-1][2:])
+                print("New position: ", new_position)
+                self.map.change_piece(new_position, identifier)
                 return True
         return False
 
@@ -71,15 +78,15 @@ class Game:
         :return: None
         """
         if (
-            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             row, col = (x - self.config.X_OFFSET) // self.config.SQUARE_SIZE, (
-                y - self.config.Y_OFFSET
+                    y - self.config.Y_OFFSET
             ) // self.config.SQUARE_SIZE
             if (
-                self.map.board[col][row]
-                and self.map.board[col][row].color == self.map.curr_player
+                    self.map.board[col][row]
+                    and self.map.board[col][row].color == self.map.curr_player
             ):
                 self.selected_piece = self.map.board[col][row]
                 self.original_pos = Position(x=row, y=col)
@@ -109,11 +116,11 @@ class Game:
         :return: True if it is an en passant move, False otherwise
         """
         return (
-            type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
-            and new_position in self.attack_moves
-            and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
-            and self.map.board[self.original_pos.y][new_position.x].color
-            != self.map.curr_player
+                type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
+                and new_position in self.attack_moves
+                and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
+                and self.map.board[self.original_pos.y][new_position.x].color
+                != self.map.curr_player
         )
 
     def en_passant_move(self, new_position: Position) -> None:
@@ -148,7 +155,6 @@ class Game:
 
         self.map.move(self.original_pos, Position(x=new_position.x, y=new_position.y))
 
-
     def choose_type_of_move(self, x: int, y: int) -> None:
         """
         Choose the type of move to make
@@ -157,8 +163,8 @@ class Game:
         :return: None
         """
         if (
-            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             new_position = Position(
                 x=((x - self.config.X_OFFSET) // self.config.SQUARE_SIZE),
@@ -166,8 +172,8 @@ class Game:
             )
             if new_position in self.moves or new_position in self.attack_moves:
                 if (
-                    self.original_pos.x != new_position.x
-                    or self.original_pos.y != new_position.y
+                        self.original_pos.x != new_position.x
+                        or self.original_pos.y != new_position.y
                 ):
                     if self.en_passant_verification(new_position):
                         self.en_passant_move(new_position)
@@ -189,13 +195,18 @@ class Game:
                     self.map.curr_player = (
                         "white" if self.map.curr_player == "black" else "black"
                     )
+
+                if not self.map.promoting_piece:
+                    last_move = self.map.history[-1]
+                    self.engine.make_moves_from_current_position([last_move])
+
         self.map.check(self.map.curr_player)
         self.mate = self.map.calculate_mate()
         self.stalemate = self.map.calculate_stalemate()
-
         self.selected_piece = None
         self.moves, self.attack_moves = None, None
         self.mouse_down = False
+
 
     def reset_clicked(self, x, y) -> None:
         """
@@ -204,12 +215,7 @@ class Game:
         :param y: y coordinate of the mouse
         :return: None
         """
-        button_rect = pygame.Rect(
-            self.config.START_BUTTON_X,
-            self.config.START_BUTTON_Y,
-            self.config.BUTTON_WIDTH,
-            self.config.BUTTON_HEIGHT,
-        )
+        button_rect = pygame.Rect(self.config.RESET_BUTTON)
         if button_rect.collidepoint(x, y):
             self.reinitialize()
 
@@ -220,7 +226,7 @@ class Game:
         """
         pygame.init()
         pygame.font.init()
-
+        self.game_type = self.menu.main()
         timer = pygame.time.Clock()
         pygame.display.set_caption("Chess App")
         self.engine.set_position([])
@@ -229,18 +235,17 @@ class Game:
         while self.running:
             timer.tick(self.config.FPS)
 
-            if self.fps_counter % 30 == 0: # every 30 frames to not kill the CPU
+            if self.fps_counter % 30 == 0:  # every 30 frames to not kill the CPU
                 evaluation = self.engine.get_evaluation()
             self.controller.update_screen(evaluation['value'])
             self.fps_counter += 1
-            if self.map.curr_player == "black":
-                last_move = self.map.history[-1]
-                self.engine.make_moves_from_current_position([last_move])
+
+            if self.game_type == "computer" and self.map.curr_player == "black":
                 result = self.engine.get_best_move()
                 self.map.make_engine_move(result)
                 self.engine.make_moves_from_current_position([result])
                 self.map.check(self.map.curr_player)
-                self.mate= self.map.calculate_mate()
+                self.mate = self.map.calculate_mate()
                 self.stalemate = self.map.calculate_stalemate()
 
             for event in pygame.event.get():
@@ -248,7 +253,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
-                if self.map.curr_player == "white":
+                if self.map.curr_player == "white" or self.game_type == "onboard":
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         x, y = pygame.mouse.get_pos()
                         self.reset_clicked(x, y)
@@ -276,6 +281,8 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
                     if self.handle_promotion(x, y):
+                        last_move = self.map.history[-1]
+                        self.engine.make_moves_from_current_position([last_move])
                         self.map.promoting_piece = None
                         self.map.check(self.map.curr_player)
                         self.mate = self.map.calculate_mate()
@@ -299,7 +306,7 @@ class Game:
             if self.map.check_white or self.map.check_black:
                 self.controller.draw_checks()
 
-            if(self.fps_counter % 100 == 0):
+            if (self.fps_counter % 100 == 0):
                 print(self.map.history)
 
             pygame.display.flip()
