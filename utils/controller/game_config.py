@@ -23,6 +23,7 @@ class GameConfig:
         "BEIGE": (255, 246, 231),
         "APP_BACKGROUND": (20, 20, 20),
         "MENU_BACKGROUND": (40, 40, 40),
+        "MESSAGE_BACKGROUND": (50, 50, 50),
         "BUTTON_BACKGROUND": (60, 60, 60),
         "MOVE_BACKGROUND": (70, 70, 70),
         "MOVE_NUMBER_BACKGROUND": (80, 80, 80),
@@ -30,7 +31,6 @@ class GameConfig:
     LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"]
     FPS = 30
     IMAGES = {}
-    # Rectangles for the buttons and the text
     UTILS_RECTANGLE = (X_OFFSET + BOARD_SIZE + 100, Y_OFFSET + 50, 400, 500)
     RESET_BUTTON = (X_OFFSET + BOARD_SIZE + 200, Y_OFFSET + BOARD_SIZE - 25, 200, 60)
     x, y, width, height, = UTILS_RECTANGLE
@@ -41,6 +41,7 @@ class GameConfig:
     FONT = pygame.font.Font(None, 32)
     EVAL_FONT = pygame.font.Font(None, 24)
 
+    HISTORY_RECTANGLE = pygame.Rect(150, 50, 500, 400)
     def load_images(self) -> None:
         """
         Load the images of the pieces and store them in the IMAGES dictionary.

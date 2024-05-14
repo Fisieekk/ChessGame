@@ -12,6 +12,8 @@ class GameController:
         self.screen = pygame.display.set_mode(
             (self.config.WINDOW_WIDTH, self.config.WINDOW_HEIGHT)
         )
+        self.scroll_offset = 0
+
 
     def draw_board(self) -> None:
         """
@@ -132,6 +134,7 @@ class GameController:
             message = color[0].upper() + color[1:] + " won by checkmate"
         font = pygame.font.Font(None, 72)
         text = font.render(message, True, self.config.COLORS["GREEN"])
+
         text_rect = text.get_rect(
             center=(
                 self.config.X_OFFSET + self.config.BOARD_SIZE // 2,
@@ -226,35 +229,15 @@ class GameController:
             self.config.COLORS["MENU_BACKGROUND"],
             self.config.UTILS_RECTANGLE,
             border_radius=self.config.BORDER_RADIUS
-        )
-        white_moves, black_moves, last_move_num = self.map.get_eight_last_moves()
-        self.draw_last_moves_numbers(last_move_num)
-        self.draw_last_white_moves(white_moves)
-        self.draw_last_black_moves(black_moves)
+        )   
 
-    # TODO implement the following methods
-    def draw_last_moves_numbers(self, last_move_num: int) -> None:
-        """
-        Draws the last moves numbers on the board.
-        :return: None
-        """
-        pass
-
-    def draw_last_white_moves(self, moves: List[str]) -> None:
-        """
-        Draws the last white moves on the board.
-        :param moves: list of the last white moves
-        :return: None
-        """
-        pass
-
-    def draw_last_black_moves(self, moves: List[str]) -> None:
-        """
-        Draws the last black moves on the board.
-        :param moves: list of the last black moves
-        :return: None
-        """
-        pass
+    def draw_moves_list(self):
+        y_offset = 5 - self.scroll_offset
+        for move in self.map.history:
+            move_surf = self.config.FONT.render(move, True, (255, 255, 255))
+            move_rect = move_surf.get_rect(topleft=(self.config.HISTORY_RECTANGLE.x + 5, self.config.HISTORY_RECTANGLE.y + y_offset))
+            self.screen.blit(move_surf, move_rect)
+            y_offset += move_surf.get_height() + 5
 
     def draw_material_diff(self, evaluation: float) -> None:
         """

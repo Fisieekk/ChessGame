@@ -11,7 +11,10 @@ class Menu:
         self.config = MenuConfig()
         self.screen = pygame.display.set_mode((self.config.WINDOW_WIDTH, self.config.WINDOW_HEIGHT))
         self.buttons = []
-        self.enemy_type = None
+        self.game_type = None
+        self.choosing_color = False
+        self.chosen_color = None
+        self.config_complete = False
 
     def draw_menu_background(self) -> None:
         """
@@ -28,11 +31,13 @@ class Menu:
         Draw the buttons for the menu
         :return: None
         """
-        for text, (x, y, width, height) in self.config.GAME_TYPE_BUTTONS.items():
+        button_config = self.config.COLOR_CHOICE_BUTTONS if self.choosing_color else self.config.GAME_TYPE_BUTTONS
+
+        for text, (x, y, width, height) in button_config.items():
             button_rect = pygame.Rect(x, y, width, height)
             pygame.draw.rect(self.screen, self.config.COLORS["BUTTON_BACKGROUND"], button_rect,
                              border_radius=self.config.BORDER_RADIUS)
-            if len(self.buttons) < len(self.config.GAME_TYPE_BUTTONS):
+            if len(self.buttons) < len(button_config):
                 self.buttons.append((button_rect, text))
 
             text_surf = self.config.FONT.render(text, True, self.config.COLORS["WHITE"])
@@ -56,8 +61,21 @@ class Menu:
         """
         for button_rect, action in self.buttons:
             if button_rect.collidepoint(x, y):
-                self.enemy_type = action.split()[-1] # Get the last word of the button text(onboard/computer/game)
-                print(f"Selected game mode: {self.enemy_type}")  # Debug print
+                if action == "Play with computer":
+                    self.game_type = "computer"
+                    self.choosing_color = True
+                    self.buttons.clear()
+                elif action in ["Play as white", "Play as black"]:
+                    self.chosen_color = action.split()[-1]  # Store chosen color
+                    self.config_complete = True
+                elif action == "Back":
+                    self.choosing_color = False
+                    self.buttons.clear()
+                else:
+                    self.game_type = action.split()[-1]  # Get the last word of the button text(onboard/quit)
+                    self.config_complete = True
+                print(f"Game type: {self.game_type}")
+
 
     def update_screen(self) -> None:
         """
@@ -74,7 +92,7 @@ class Menu:
         :return:
         """
         pygame.display.set_caption('Menu')
-        while self.enemy_type is None:
+        while not self.config_complete:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -82,4 +100,4 @@ class Menu:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.handle_enemy_chose_menu(*event.pos)
             self.update_screen()
-        return self.enemy_type
+        return self.game_type

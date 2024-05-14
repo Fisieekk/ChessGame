@@ -1,11 +1,9 @@
 import pygame
 from chess import engine
-
 from chess_engine import *
 from .game_config import GameConfig
 from .game_controller import GameController
 from stockfish import Stockfish
-
 from ..presenter.menu import Menu
 
 
@@ -32,6 +30,8 @@ class Game:
         self.stockfish_path = r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
         self.engine = Stockfish(path=self.stockfish_path)
         self.game_type = None
+        self.player_color = "white"
+        self.engine_color = "black"
 
     def reinitialize(self) -> None:
         """
@@ -63,7 +63,7 @@ class Game:
         """
         for identifier, current_position in self.promoting_pieces:
             if current_position.collidepoint(x, y):
-                new_position = Position(x=0,y=0)
+                new_position = Position(x=0, y=0)
                 new_position.from_string_to_map(self.map.history[-1][2:])
                 print("New position: ", new_position)
                 self.map.change_piece(new_position, identifier)
@@ -207,7 +207,6 @@ class Game:
         self.moves, self.attack_moves = None, None
         self.mouse_down = False
 
-
     def reset_clicked(self, x, y) -> None:
         """
         Reset the game if the reset button is clicked
@@ -227,6 +226,12 @@ class Game:
         pygame.init()
         pygame.font.init()
         self.game_type = self.menu.main()
+        if self.game_type == "Quit":
+            pygame.quit()
+            return
+        elif self.game_type == "computer":
+            self.player_color = self.menu.chosen_color
+            self.engine_color = "black" if self.player_color == "white" else "white"
         timer = pygame.time.Clock()
         pygame.display.set_caption("Chess App")
         self.engine.set_position([])
@@ -240,20 +245,19 @@ class Game:
             self.controller.update_screen(evaluation['value'])
             self.fps_counter += 1
 
-            if self.game_type == "computer" and self.map.curr_player == "black":
+            if self.game_type == "computer" and self.map.curr_player == self.engine_color:
                 result = self.engine.get_best_move()
-                self.map.make_engine_move(result)
+                self.map.make_engine_move(result, self.player_color, self.engine_color)
                 self.engine.make_moves_from_current_position([result])
                 self.map.check(self.map.curr_player)
                 self.mate = self.map.calculate_mate()
                 self.stalemate = self.map.calculate_stalemate()
 
             for event in pygame.event.get():
-                # quit
                 if event.type == pygame.QUIT:
                     self.running = False
 
-                if self.map.curr_player == "white" or self.game_type == "onboard":
+                if self.map.curr_player == self.player_color or self.game_type == "onboard":
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         x, y = pygame.mouse.get_pos()
                         self.reset_clicked(x, y)

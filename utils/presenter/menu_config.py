@@ -33,7 +33,14 @@ class MenuConfig:
         self.GAME_TYPE_BUTTONS = {
             "Play onboard": (self.X_OFFSET + 150, self.Y_OFFSET + 50, 500, 100),
             "Play with computer": (self.X_OFFSET + 150, self.Y_OFFSET + 200, 500, 100),
-            "Custom game": (self.X_OFFSET + 150, self.Y_OFFSET + 350, 500, 100),
+            "Quit": (self.X_OFFSET + 150, self.Y_OFFSET + 350, 500, 100),
         }
+
+        self.COLOR_CHOICE_BUTTONS = {
+            "Play as white": (self.X_OFFSET + 150, self.Y_OFFSET + 50, 500, 100),
+            "Play as black": (self.X_OFFSET + 150, self.Y_OFFSET + 200, 500, 100),
+            "Back": (self.X_OFFSET + 150, self.Y_OFFSET + 350, 500, 100),
+        }
+
         self.FONT = pygame.font.Font(None, 36)
         self.BORDER_RADIUS = 10

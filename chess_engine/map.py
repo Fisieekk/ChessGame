@@ -406,20 +406,21 @@ class Map:
 
         self.promoting_piece = None
 
-    def make_engine_move(self, move: str) -> None:
+    def make_engine_move(self, move: str, player: str, engine: str) -> None:
         """
         Method to make a move for the engine.
-        For now engine will be playing only as black.
         :param move: move to be made
+        :param player: the player who should move next
+        :param engine: the engine making the move
         :return: None
         """
         start = Position(x=ord(move[0]) - 97, y=8 - int(move[1]))
         end = Position(x=ord(move[2]) - 97, y=8 - int(move[3]))
         self.move(start, end)
         if len(move) == 5:
-            self.change_piece(end, 'b' + move[4].upper())
+            self.change_piece(end, engine[0] + move[4].upper())
             self.history[-1] += move[4].lower()
-        self.curr_player = "white"
+        self.curr_player = player
 
     def get_eight_last_moves(self) -> tuple[list, list, int]:
         """
