@@ -1,3 +1,5 @@
+from time import sleep
+
 import pygame
 from chess import engine
 from chess_engine import *
@@ -28,7 +30,7 @@ class Game:
         self.promoting_pieces = None
         self.config.load_images()
         self.stockfish_path = r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
-        self.engine = Stockfish(path=self.stockfish_path)
+        self.engine = Stockfish(path=self.stockfish_path,parameters=self.config.STOCKFISH_PARAMETERS)
         self.game_type = None
         self.player_color = "white"
         self.engine_color = "black"
@@ -240,7 +242,7 @@ class Game:
         while self.running:
             timer.tick(self.config.FPS)
 
-            if self.fps_counter % 30 == 0:  # every 30 frames to not kill the CPU
+            if self.fps_counter % 15 == 0:  # every 15 frames to not kill the CPU
                 evaluation = self.engine.get_evaluation()
             self.controller.update_screen(evaluation['value'])
             self.fps_counter += 1
@@ -262,17 +264,13 @@ class Game:
                         x, y = pygame.mouse.get_pos()
                         self.reset_clicked(x, y)
 
-                    # if game not ended
                     if not self.mate and not self.stalemate:
-                        # and we don't have a promotion
                         if not self.map.promoting_piece:
-                            # selecting a piece
                             if event.type == pygame.MOUSEBUTTONDOWN:
                                 x, y = pygame.mouse.get_pos()
                                 self.select_piece(x, y)
                                 self.update_possible_moves()
 
-                            # if we have selected piece we can make a move
                             if event.type == pygame.MOUSEBUTTONUP and self.selected_piece:
                                 x, y = pygame.mouse.get_pos()
                                 self.choose_type_of_move(x, y)

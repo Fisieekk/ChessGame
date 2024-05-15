@@ -14,7 +14,6 @@ class GameController:
         )
         self.scroll_offset = 0
 
-
     def draw_board(self) -> None:
         """
         Draws the board with the squares.
@@ -219,7 +218,7 @@ class GameController:
             width=2)
         self.screen.blit(text, text_rect)
 
-    def draw_utiles_rect(self) -> None:
+    def draw_utils_rect(self) -> None:
         """
         Draws the rectangle for the utils on the board.
         :return: None
@@ -229,42 +228,56 @@ class GameController:
             self.config.COLORS["MENU_BACKGROUND"],
             self.config.UTILS_RECTANGLE,
             border_radius=self.config.BORDER_RADIUS
-        )   
+        )
 
-    def draw_moves_list(self):
-        y_offset = 5 - self.scroll_offset
-        for move in self.map.history:
-            move_surf = self.config.FONT.render(move, True, (255, 255, 255))
-            move_rect = move_surf.get_rect(topleft=(self.config.HISTORY_RECTANGLE.x + 5, self.config.HISTORY_RECTANGLE.y + y_offset))
-            self.screen.blit(move_surf, move_rect)
-            y_offset += move_surf.get_height() + 5
-
-    def draw_material_diff(self, evaluation: float) -> None:
+    def draw_history(self):
         """
-        Draws the material difference between the two players(chart on the left side of the board).
-        Will be updated to show stockfish evaluation in the future.
+        Draws the moves list on the board.
+        :return: None
+        """
+        number_rect, white_rect, black_rect = self.config.HISTORY_RECTANGLES
+        n = len(self.map.history)
+        index = 0
+        for i in range(max(0, n - 20 if n % 2 == 0 else n - 19), n, 2):
+            x, y, width, height = number_rect
+            pygame.draw.rect(self.screen, self.config.COLORS["MOVE_NUMBER_BACKGROUND"],
+                             (x, y + index * height, width, height))
+            text = self.config.FONT.render(str(i // 2 + 1), True, self.config.COLORS["WHITE"])
+            text_rect = text.get_rect(center=(x + width // 2, y + index * height + height // 2))
+            self.screen.blit(text, text_rect)
+            x, y, width, height = white_rect
+            pygame.draw.rect(self.screen, self.config.COLORS["WHITE_MOVE_BACKGROUND"],
+                             (x, y + index * height, width, height))
+            text = self.config.FONT.render(self.map.history[i], True, self.config.COLORS["WHITE"])
+            text_rect = text.get_rect(center=(x + width // 2, y + index * height + height // 2))
+            self.screen.blit(text, text_rect)
+            if (i + 1 == n):  # if last move was white
+                break
+            x, y, width, height = black_rect
+            pygame.draw.rect(self.screen, self.config.COLORS["BLACK_MOVE_BACKGROUND"],
+                             (x, y + index * height, width, height))
+            text = self.config.FONT.render(self.map.history[i + 1], True, self.config.COLORS["WHITE"])
+            text_rect = text.get_rect(center=(x + width // 2, y + index * height + height // 2))
+            self.screen.blit(text, text_rect)
+            index += 1
+
+    def draw_evaluation_diff(self, evaluation: float) -> None:
+        """
+        Draws the stockfish evaluation of position (chart on the left side of the board).
         :param evaluation: evaluation of the position, positive if white is winning, negative if black is winning
         :return: None
         """
-        ratio = (-evaluation / 100 + 10) / 20
-        b_x, b_y = (
-            self.config.X_OFFSET - 2 * self.config.MATERIAL_CHART_WIDTH,
-            self.config.Y_OFFSET,
-        )
-        w_x, w_y = b_x, b_y + int(ratio * self.config.BOARD_SIZE)
-        b_x_diff, b_y_diff = self.config.MATERIAL_CHART_WIDTH, w_y
-        w_x_diff, w_y_diff = (
-            self.config.MATERIAL_CHART_WIDTH,
-            self.config.Y_OFFSET + self.config.BOARD_SIZE - w_y,
-        )
-        pygame.draw.rect(self.screen, (0, 0, 0), (b_x, b_y, b_x_diff, b_y_diff))
-
-        pygame.draw.rect(self.screen, (255, 255, 255), (b_x, w_y, w_x_diff, w_y_diff))
-
-        text = self.config.EVAL_FONT.render(str(evaluation/100), True, self.config.COLORS["WHITE"])
+        normalized_eval = (evaluation / 100 + 10) / 20
+        normalized_eval = max(0.0, min(normalized_eval, 1.0))
+        w_y_diff = int(normalized_eval * self.config.BOARD_SIZE)
+        b_y_diff = self.config.BOARD_SIZE - w_y_diff
+        b_x, b_y = (self.config.X_OFFSET - 2 * self.config.MATERIAL_CHART_WIDTH, self.config.Y_OFFSET)
+        w_x, w_y = b_x, b_y + b_y_diff
+        pygame.draw.rect(self.screen, (0, 0, 0), (b_x, b_y, self.config.MATERIAL_CHART_WIDTH, b_y_diff))
+        pygame.draw.rect(self.screen, (255, 255, 255), (w_x, w_y, self.config.MATERIAL_CHART_WIDTH, w_y_diff))
+        text = self.config.EVAL_FONT.render(f"{evaluation / 100:.2f}", True, self.config.COLORS["WHITE"])
         text_rect = text.get_rect(
-            center=(b_x + b_x_diff//2, self.config.Y_OFFSET+self.config.BOARD_SIZE + 25),
-        )
+            center=(b_x + self.config.MATERIAL_CHART_WIDTH // 2, self.config.Y_OFFSET + self.config.BOARD_SIZE + 25))
         self.screen.blit(text, text_rect)
 
     def draw_utils(self, evaluation: float) -> None:
@@ -273,8 +286,9 @@ class GameController:
         :return: None
         """
         self.draw_reset_button()
-        self.draw_utiles_rect()
-        self.draw_material_diff(evaluation)
+        self.draw_utils_rect()
+        self.draw_evaluation_diff(evaluation)
+        self.draw_history()
 
     def update_screen(self, evaluation: float) -> None:
         """

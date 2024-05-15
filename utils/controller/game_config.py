@@ -25,42 +25,44 @@ class GameConfig:
         "MENU_BACKGROUND": (40, 40, 40),
         "MESSAGE_BACKGROUND": (50, 50, 50),
         "BUTTON_BACKGROUND": (60, 60, 60),
-        "MOVE_BACKGROUND": (70, 70, 70),
+        "WHITE_MOVE_BACKGROUND": (70, 70, 70),
         "MOVE_NUMBER_BACKGROUND": (80, 80, 80),
+        "BLACK_MOVE_BACKGROUND": (90, 90, 90),
     }
     LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"]
     FPS = 30
     IMAGES = {}
-    UTILS_RECTANGLE = (X_OFFSET + BOARD_SIZE + 100, Y_OFFSET + 50, 400, 500)
-    RESET_BUTTON = (X_OFFSET + BOARD_SIZE + 200, Y_OFFSET + BOARD_SIZE - 25, 200, 60)
+    UTILS_RECTANGLE = (X_OFFSET + BOARD_SIZE + 100, Y_OFFSET, 400, 520)
     x, y, width, height, = UTILS_RECTANGLE
-    LAST_MOVE_NUMBER_RECT = (x, y + 50, 100, 50)
-    LAST_BLACK_MOVE_RECT = (x + 100, y + 50, 150, 50)
-    LAST_WHITE_MOVE_RECT = (x + 250, y + 100, 150, 50)
+    RESET_BUTTON = (x, y + height + 20, 400, 50)
+    HISTORY_RECTANGLES = ((x + 10, y + 10, 90, 50), (x + 100, y + 10, 145, 50), (x + 245, y + 10, 145, 50))
     BORDER_RADIUS = 10
     FONT = pygame.font.Font(None, 32)
     EVAL_FONT = pygame.font.Font(None, 24)
 
-    HISTORY_RECTANGLE = pygame.Rect(150, 50, 500, 400)
+    STOCKFISH_PARAMETERS = {
+        "Debug Log File": "",
+        "Contempt": 0,
+        "Min Split Depth": 0,
+        "Threads": 8,
+        "Ponder": "false",
+        "Hash": 4096,
+        "MultiPV": 1,
+        "Skill Level": 1,
+        "Move Overhead": 10,
+        "Minimum Thinking Time": 10,
+        "Slow Mover": 100,
+        "UCI_Chess960": "false",
+        "UCI_LimitStrength": "true",
+        "UCI_Elo": 500
+    }
+
     def load_images(self) -> None:
         """
         Load the images of the pieces and store them in the IMAGES dictionary.
         :return: None
         """
-        pieces = [
-            "wR",
-            "wN",
-            "wB",
-            "wQ",
-            "wK",
-            "wP",
-            "bR",
-            "bN",
-            "bB",
-            "bQ",
-            "bK",
-            "bP",
-        ]
+        pieces = ["wR", "wN", "wB", "wQ", "wK", "wP", "bR", "bN", "bB", "bQ", "bK", "bP"]
         for piece in pieces:
             self.IMAGES[piece] = pygame.transform.scale(
                 pygame.image.load("utils/images/" + piece + ".png"),
