@@ -184,13 +184,13 @@ class GameController:
                 (x - self.config.SQUARE_SIZE // 2, y - self.config.SQUARE_SIZE // 2),
             )
 
-    def draw_reset_button(self) -> None:
+    def draw_new_game_button(self) -> None:
         """
         Draws the reset button on the board.
         :return: None
         """
         font = pygame.font.SysFont(None, 64)
-        text = font.render("RESET", True, self.config.COLORS["BLACK"])
+        text = font.render("New Game", True, self.config.COLORS["BLACK"])
         x, y, width, height = self.config.RESET_BUTTON
         text_rect = text.get_rect(
             center=(x + width // 2, y + height // 2),
@@ -285,7 +285,7 @@ class GameController:
         Draws the reset button, undo button and material difference chart on the board.
         :return: None
         """
-        self.draw_reset_button()
+        self.draw_new_game_button()
         self.draw_utils_rect()
         self.draw_evaluation_diff(evaluation)
         self.draw_history()

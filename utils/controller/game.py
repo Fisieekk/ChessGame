@@ -209,7 +209,7 @@ class Game:
         self.moves, self.attack_moves = None, None
         self.mouse_down = False
 
-    def reset_clicked(self, x, y) -> None:
+    def new_game_button_clicked(self, x, y) -> None:
         """
         Reset the game if the reset button is clicked
         :param x: x coordinate of the mouse
@@ -262,7 +262,7 @@ class Game:
                 if self.map.curr_player == self.player_color or self.game_type == "onboard":
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         x, y = pygame.mouse.get_pos()
-                        self.reset_clicked(x, y)
+                        self.new_game_button_clicked(x, y)
 
                     if not self.mate and not self.stalemate:
                         if not self.map.promoting_piece:
