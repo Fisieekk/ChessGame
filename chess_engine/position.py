@@ -17,5 +17,5 @@ class Position(BaseModel):
         Set the position from a string
         :param position: The string position
         """
-        self.x = ord(position[0]) - ord('a')
-        self.y = 8-int(position[1])
+        self.x = ord(position[0]) - ord("a")
+        self.y = 8 - int(position[1])

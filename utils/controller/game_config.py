@@ -33,9 +33,18 @@ class GameConfig:
     FPS = 30
     IMAGES = {}
     UTILS_RECTANGLE = (X_OFFSET + BOARD_SIZE + 100, Y_OFFSET, 400, 520)
-    x, y, width, height, = UTILS_RECTANGLE
+    (
+        x,
+        y,
+        width,
+        height,
+    ) = UTILS_RECTANGLE
     RESET_BUTTON = (x, y + height + 20, 400, 50)
-    HISTORY_RECTANGLES = ((x + 10, y + 10, 90, 50), (x + 100, y + 10, 145, 50), (x + 245, y + 10, 145, 50))
+    HISTORY_RECTANGLES = (
+        (x + 10, y + 10, 90, 50),
+        (x + 100, y + 10, 145, 50),
+        (x + 245, y + 10, 145, 50),
+    )
     BORDER_RADIUS = 10
     FONT = pygame.font.Font(None, 32)
     EVAL_FONT = pygame.font.Font(None, 24)
@@ -54,7 +63,7 @@ class GameConfig:
         "Slow Mover": 100,
         "UCI_Chess960": "false",
         "UCI_LimitStrength": "true",
-        "UCI_Elo": 500
+        "UCI_Elo": 1500,
     }
 
     def load_images(self) -> None:
@@ -62,7 +71,20 @@ class GameConfig:
         Load the images of the pieces and store them in the IMAGES dictionary.
         :return: None
         """
-        pieces = ["wR", "wN", "wB", "wQ", "wK", "wP", "bR", "bN", "bB", "bQ", "bK", "bP"]
+        pieces = [
+            "wR",
+            "wN",
+            "wB",
+            "wQ",
+            "wK",
+            "wP",
+            "bR",
+            "bN",
+            "bB",
+            "bQ",
+            "bK",
+            "bP",
+        ]
         for piece in pieces:
             self.IMAGES[piece] = pygame.transform.scale(
                 pygame.image.load("utils/images/" + piece + ".png"),

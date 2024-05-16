@@ -14,7 +14,7 @@ class MenuConfig:
             "Blitz": ["3+0", "3+2", "5+0", "5+3"],
             "Rapid": ["10+0", "10+5", "15+10"],
             "Classical": ["30+0", "30+20"],
-            "Custom": ["Custom time settings"]
+            "Custom": ["Custom time settings"],
         }
         self.COLORS = {
             "WHITE": (255, 255, 255),

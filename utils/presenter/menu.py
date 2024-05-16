@@ -9,7 +9,9 @@ class Menu:
     def __init__(self):
         pygame.init()
         self.config = MenuConfig()
-        self.screen = pygame.display.set_mode((self.config.WINDOW_WIDTH, self.config.WINDOW_HEIGHT))
+        self.screen = pygame.display.set_mode(
+            (self.config.WINDOW_WIDTH, self.config.WINDOW_HEIGHT)
+        )
         self.buttons = []
         self.game_type = None
         self.choosing_color = False
@@ -21,22 +23,38 @@ class Menu:
         Draw the background of the menu rectangle with rounded corners
         :return: None
         """
-        button_rect = pygame.Rect(self.config.X_OFFSET, self.config.Y_OFFSET, self.config.MENU_WIDTH,
-                                  self.config.MENU_HEIGHT)
-        pygame.draw.rect(self.screen, self.config.COLORS["MENU_BACKGROUND"], button_rect,
-                         border_radius=self.config.BORDER_RADIUS)
+        button_rect = pygame.Rect(
+            self.config.X_OFFSET,
+            self.config.Y_OFFSET,
+            self.config.MENU_WIDTH,
+            self.config.MENU_HEIGHT,
+        )
+        pygame.draw.rect(
+            self.screen,
+            self.config.COLORS["MENU_BACKGROUND"],
+            button_rect,
+            border_radius=self.config.BORDER_RADIUS,
+        )
 
     def draw_buttons(self) -> None:
         """
         Draw the buttons for the menu
         :return: None
         """
-        button_config = self.config.COLOR_CHOICE_BUTTONS if self.choosing_color else self.config.GAME_TYPE_BUTTONS
+        button_config = (
+            self.config.COLOR_CHOICE_BUTTONS
+            if self.choosing_color
+            else self.config.GAME_TYPE_BUTTONS
+        )
 
         for text, (x, y, width, height) in button_config.items():
             button_rect = pygame.Rect(x, y, width, height)
-            pygame.draw.rect(self.screen, self.config.COLORS["BUTTON_BACKGROUND"], button_rect,
-                             border_radius=self.config.BORDER_RADIUS)
+            pygame.draw.rect(
+                self.screen,
+                self.config.COLORS["BUTTON_BACKGROUND"],
+                button_rect,
+                border_radius=self.config.BORDER_RADIUS,
+            )
             if len(self.buttons) < len(button_config):
                 self.buttons.append((button_rect, text))
 
@@ -72,10 +90,11 @@ class Menu:
                     self.choosing_color = False
                     self.buttons.clear()
                 else:
-                    self.game_type = action.split()[-1]  # Get the last word of the button text(onboard/quit)
+                    self.game_type = action.split()[
+                        -1
+                    ]  # Get the last word of the button text(onboard/quit)
                     self.config_complete = True
                 print(f"Game type: {self.game_type}")
-
 
     def update_screen(self) -> None:
         """
@@ -91,7 +110,7 @@ class Menu:
         Main loop for the menu
         :return:
         """
-        pygame.display.set_caption('Menu')
+        pygame.display.set_caption("Menu")
         while not self.config_complete:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

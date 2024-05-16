@@ -122,25 +122,57 @@ class GameController:
             ),
         )
 
-    def draw_message(self, color: Optional[str], message: Optional[str]) -> None:
+    def draw_message(
+        self,
+        color: Optional[str],
+        message: Optional[str],
+        game_type: Optional[str],
+        pve_player_color: Optional[str],
+    ) -> None:
         """
         Draws a message(when is checkmate or stalemate) on the board.
         :param color: color of the player who won, None if it is a stalemate
         :param message: message to be displayed(when is stalemate), None if it is a checkmate
+        :param game_type: type of the game
+        :param PvE_player_color: color of the player in PvE game
         :return: None
         """
+        lose: bool = False
         if message is None:
-            message = color[0].upper() + color[1:] + " won by checkmate"
+            if game_type == "computer":
+                if color == pve_player_color:
+                    message = "You won by checkmate"
+                else:
+                    message = "Computer won by checkmate"
+                    lose = True
+            else:
+                message = color[0].upper() + color[1:] + " won by checkmate"
         font = pygame.font.Font(None, 72)
-        text = font.render(message, True, self.config.COLORS["GREEN"])
-
+        text = font.render(message, True, self.config.COLORS["WHITE"])
+        if lose:
+            symbol = pygame.transform.scale(
+                pygame.image.load("utils/images/cross.png"),
+                (self.config.SQUARE_SIZE, self.config.SQUARE_SIZE),
+            )
+        else:
+            symbol = pygame.transform.scale(
+                pygame.image.load("utils/images/crown.png"),
+                (self.config.SQUARE_SIZE, self.config.SQUARE_SIZE),
+            )
+        symbol_rect = symbol.get_rect(
+            center=(
+                self.config.X_OFFSET + self.config.BOARD_SIZE // 2,
+                self.config.Y_OFFSET * 0.2,
+            )
+        )
         text_rect = text.get_rect(
             center=(
                 self.config.X_OFFSET + self.config.BOARD_SIZE // 2,
-                self.config.Y_OFFSET + self.config.BOARD_SIZE // 2,
+                self.config.Y_OFFSET * 0.7,
             )
         )
         self.screen.blit(text, text_rect)
+        self.screen.blit(symbol, symbol_rect)
 
     def draw_promotion_options(self, position: Position) -> list[tuple[Any, Any]]:
         """
@@ -176,8 +208,8 @@ class GameController:
         :return: None
         """
         if (
-                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             self.screen.blit(
                 self.config.IMAGES[selected_piece.get_identificator()],
@@ -208,14 +240,15 @@ class GameController:
             self.screen,
             button_color,
             self.config.RESET_BUTTON,
-            border_radius=self.config.BORDER_RADIUS
+            border_radius=self.config.BORDER_RADIUS,
         )
         pygame.draw.rect(
             self.screen,
             self.config.COLORS["BLACK"],
             self.config.RESET_BUTTON,
             border_radius=self.config.BORDER_RADIUS,
-            width=2)
+            width=2,
+        )
         self.screen.blit(text, text_rect)
 
     def draw_utils_rect(self) -> None:
@@ -227,7 +260,7 @@ class GameController:
             self.screen,
             self.config.COLORS["MENU_BACKGROUND"],
             self.config.UTILS_RECTANGLE,
-            border_radius=self.config.BORDER_RADIUS
+            border_radius=self.config.BORDER_RADIUS,
         )
 
     def draw_history(self):
@@ -240,24 +273,45 @@ class GameController:
         index = 0
         for i in range(max(0, n - 20 if n % 2 == 0 else n - 19), n, 2):
             x, y, width, height = number_rect
-            pygame.draw.rect(self.screen, self.config.COLORS["MOVE_NUMBER_BACKGROUND"],
-                             (x, y + index * height, width, height))
-            text = self.config.FONT.render(str(i // 2 + 1), True, self.config.COLORS["WHITE"])
-            text_rect = text.get_rect(center=(x + width // 2, y + index * height + height // 2))
+            pygame.draw.rect(
+                self.screen,
+                self.config.COLORS["MOVE_NUMBER_BACKGROUND"],
+                (x, y + index * height, width, height),
+            )
+            text = self.config.FONT.render(
+                str(i // 2 + 1), True, self.config.COLORS["WHITE"]
+            )
+            text_rect = text.get_rect(
+                center=(x + width // 2, y + index * height + height // 2)
+            )
             self.screen.blit(text, text_rect)
             x, y, width, height = white_rect
-            pygame.draw.rect(self.screen, self.config.COLORS["WHITE_MOVE_BACKGROUND"],
-                             (x, y + index * height, width, height))
-            text = self.config.FONT.render(self.map.history[i], True, self.config.COLORS["WHITE"])
-            text_rect = text.get_rect(center=(x + width // 2, y + index * height + height // 2))
+            pygame.draw.rect(
+                self.screen,
+                self.config.COLORS["WHITE_MOVE_BACKGROUND"],
+                (x, y + index * height, width, height),
+            )
+            text = self.config.FONT.render(
+                self.map.history[i], True, self.config.COLORS["WHITE"]
+            )
+            text_rect = text.get_rect(
+                center=(x + width // 2, y + index * height + height // 2)
+            )
             self.screen.blit(text, text_rect)
-            if (i + 1 == n):  # if last move was white
+            if i + 1 == n:  # if last move was white
                 break
             x, y, width, height = black_rect
-            pygame.draw.rect(self.screen, self.config.COLORS["BLACK_MOVE_BACKGROUND"],
-                             (x, y + index * height, width, height))
-            text = self.config.FONT.render(self.map.history[i + 1], True, self.config.COLORS["WHITE"])
-            text_rect = text.get_rect(center=(x + width // 2, y + index * height + height // 2))
+            pygame.draw.rect(
+                self.screen,
+                self.config.COLORS["BLACK_MOVE_BACKGROUND"],
+                (x, y + index * height, width, height),
+            )
+            text = self.config.FONT.render(
+                self.map.history[i + 1], True, self.config.COLORS["WHITE"]
+            )
+            text_rect = text.get_rect(
+                center=(x + width // 2, y + index * height + height // 2)
+            )
             self.screen.blit(text, text_rect)
             index += 1
 
@@ -271,13 +325,30 @@ class GameController:
         normalized_eval = max(0.0, min(normalized_eval, 1.0))
         w_y_diff = int(normalized_eval * self.config.BOARD_SIZE)
         b_y_diff = self.config.BOARD_SIZE - w_y_diff
-        b_x, b_y = (self.config.X_OFFSET - 2 * self.config.MATERIAL_CHART_WIDTH, self.config.Y_OFFSET)
+        b_x, b_y = (
+            self.config.X_OFFSET - 2 * self.config.MATERIAL_CHART_WIDTH,
+            self.config.Y_OFFSET,
+        )
         w_x, w_y = b_x, b_y + b_y_diff
-        pygame.draw.rect(self.screen, (0, 0, 0), (b_x, b_y, self.config.MATERIAL_CHART_WIDTH, b_y_diff))
-        pygame.draw.rect(self.screen, (255, 255, 255), (w_x, w_y, self.config.MATERIAL_CHART_WIDTH, w_y_diff))
-        text = self.config.EVAL_FONT.render(f"{evaluation / 100:.2f}", True, self.config.COLORS["WHITE"])
+        pygame.draw.rect(
+            self.screen,
+            (0, 0, 0),
+            (b_x, b_y, self.config.MATERIAL_CHART_WIDTH, b_y_diff),
+        )
+        pygame.draw.rect(
+            self.screen,
+            (255, 255, 255),
+            (w_x, w_y, self.config.MATERIAL_CHART_WIDTH, w_y_diff),
+        )
+        text = self.config.EVAL_FONT.render(
+            f"{evaluation / 100:.2f}", True, self.config.COLORS["WHITE"]
+        )
         text_rect = text.get_rect(
-            center=(b_x + self.config.MATERIAL_CHART_WIDTH // 2, self.config.Y_OFFSET + self.config.BOARD_SIZE + 25))
+            center=(
+                b_x + self.config.MATERIAL_CHART_WIDTH // 2,
+                self.config.Y_OFFSET + self.config.BOARD_SIZE + 25,
+            )
+        )
         self.screen.blit(text, text_rect)
 
     def draw_utils(self, evaluation: float) -> None:

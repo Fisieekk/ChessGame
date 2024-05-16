@@ -29,8 +29,12 @@ class Game:
         self.stalemate = False
         self.promoting_pieces = None
         self.config.load_images()
-        self.stockfish_path = r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
-        self.engine = Stockfish(path=self.stockfish_path,parameters=self.config.STOCKFISH_PARAMETERS)
+        self.stockfish_path = (
+            r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
+        )
+        self.engine = Stockfish(
+            path=self.stockfish_path, parameters=self.config.STOCKFISH_PARAMETERS
+        )
         self.game_type = None
         self.player_color = "white"
         self.engine_color = "black"
@@ -80,15 +84,15 @@ class Game:
         :return: None
         """
         if (
-                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             row, col = (x - self.config.X_OFFSET) // self.config.SQUARE_SIZE, (
-                    y - self.config.Y_OFFSET
+                y - self.config.Y_OFFSET
             ) // self.config.SQUARE_SIZE
             if (
-                    self.map.board[col][row]
-                    and self.map.board[col][row].color == self.map.curr_player
+                self.map.board[col][row]
+                and self.map.board[col][row].color == self.map.curr_player
             ):
                 self.selected_piece = self.map.board[col][row]
                 self.original_pos = Position(x=row, y=col)
@@ -109,7 +113,7 @@ class Game:
                 self.moves, self.attack_moves, self.selected_piece
             )
         # print("Moves: ", self.moves)
-        #print("Attack moves: ", self.attack_moves)
+        # print("Attack moves: ", self.attack_moves)
 
     def en_passant_verification(self, new_position: Position) -> bool:
         """
@@ -118,11 +122,13 @@ class Game:
         :return: True if it is an en passant move, False otherwise
         """
         return (
-                type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
-                and new_position in self.attack_moves
-                and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
-                and self.map.board[self.original_pos.y][new_position.x].color
-                != self.map.curr_player
+            self.map.last_move
+            and abs(self.map.last_move[1].y - self.map.last_move[0].y) == 2
+            and type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
+            and new_position in self.attack_moves
+            and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
+            and self.map.board[self.original_pos.y][new_position.x].color
+            != self.map.curr_player
         )
 
     def en_passant_move(self, new_position: Position) -> None:
@@ -165,8 +171,8 @@ class Game:
         :return: None
         """
         if (
-                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             new_position = Position(
                 x=((x - self.config.X_OFFSET) // self.config.SQUARE_SIZE),
@@ -174,8 +180,8 @@ class Game:
             )
             if new_position in self.moves or new_position in self.attack_moves:
                 if (
-                        self.original_pos.x != new_position.x
-                        or self.original_pos.y != new_position.y
+                    self.original_pos.x != new_position.x
+                    or self.original_pos.y != new_position.y
                 ):
                     if self.en_passant_verification(new_position):
                         self.en_passant_move(new_position)
@@ -244,10 +250,13 @@ class Game:
 
             if self.fps_counter % 15 == 0:  # every 15 frames to not kill the CPU
                 evaluation = self.engine.get_evaluation()
-            self.controller.update_screen(evaluation['value'])
+            self.controller.update_screen(evaluation["value"])
             self.fps_counter += 1
 
-            if self.game_type == "computer" and self.map.curr_player == self.engine_color:
+            if (
+                self.game_type == "computer"
+                and self.map.curr_player == self.engine_color
+            ):
                 result = self.engine.get_best_move()
                 self.map.make_engine_move(result, self.player_color, self.engine_color)
                 self.engine.make_moves_from_current_position([result])
@@ -259,7 +268,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
-                if self.map.curr_player == self.player_color or self.game_type == "onboard":
+                if (
+                    self.map.curr_player == self.player_color
+                    or self.game_type == "onboard"
+                ):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         x, y = pygame.mouse.get_pos()
                         self.new_game_button_clicked(x, y)
@@ -271,7 +283,10 @@ class Game:
                                 self.select_piece(x, y)
                                 self.update_possible_moves()
 
-                            if event.type == pygame.MOUSEBUTTONUP and self.selected_piece:
+                            if (
+                                event.type == pygame.MOUSEBUTTONUP
+                                and self.selected_piece
+                            ):
                                 x, y = pygame.mouse.get_pos()
                                 self.choose_type_of_move(x, y)
 
@@ -291,11 +306,14 @@ class Game:
                         self.stalemate = self.map.calculate_stalemate()
             if self.mate:
                 self.controller.draw_message(
-                    "white" if self.map.curr_player == "black" else "black", None
+                    "white" if self.map.curr_player == "black" else "black",
+                    None,
+                    self.game_type,
+                    self.player_color,
                 )
 
             elif self.stalemate:
-                self.controller.draw_message(None, "Stalemate")
+                self.controller.draw_message(None, "Stalemate", None, None)
 
                 # dragging piece
             if self.mouse_down and self.selected_piece:
@@ -308,7 +326,7 @@ class Game:
             if self.map.check_white or self.map.check_black:
                 self.controller.draw_checks()
 
-            if (self.fps_counter % 100 == 0):
+            if self.fps_counter % 100 == 0:
                 print(self.map.history)
 
             pygame.display.flip()

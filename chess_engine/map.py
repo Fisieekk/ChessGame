@@ -107,12 +107,7 @@ class Map:
         :return: UCI notation of the move
         """
         start, end = move
-        return (
-                chr(start.x + 97)
-                + str(8 - start.y)
-                + chr(end.x + 97)
-                + str(8 - end.y)
-        )
+        return chr(start.x + 97) + str(8 - start.y) + chr(end.x + 97) + str(8 - end.y)
 
     def move(self, start: Position, end: Position) -> None:
         """
@@ -162,7 +157,9 @@ class Map:
         self.last_move = (start, end, piece)
         if type(piece) == Pawn and (end.y == 0 or end.y == 7):
             self.promoting_piece = piece
-        self.history.append(self.move_to_uci((start, end)) if castle_uci == "" else castle_uci)
+        self.history.append(
+            self.move_to_uci((start, end)) if castle_uci == "" else castle_uci
+        )
         self.turn += 1
 
     def en_passant_move(self, start: Position, end: Position) -> None:
@@ -208,7 +205,7 @@ class Map:
         return possible_moves
 
     def preventer(
-            self, moves: list, attack_moves: list, piece: Piece
+        self, moves: list, attack_moves: list, piece: Piece
     ) -> tuple[list, list]:
         """
         Method to prevent a move that is illegal.
@@ -286,12 +283,12 @@ class Map:
         """
 
         if color == "white" and self.white_king_position in self.all_possible_attacks(
-                "black"
+            "black"
         ):
             self.check_white = True
             self.check_black = False
         elif color == "black" and self.black_king_position in self.all_possible_attacks(
-                "white"
+            "white"
         ):
             self.check_white = False
             self.check_black = True
@@ -300,7 +297,7 @@ class Map:
             self.check_black = False
 
     def castle(
-            self, moves: list, attack_moves: list, piece: Piece
+        self, moves: list, attack_moves: list, piece: Piece
     ) -> tuple[list, list]:
         """
         Method to add a castle to possible moves.
@@ -319,9 +316,9 @@ class Map:
             if self.board[7][0] is not None:
                 if self.board[7][0].last_move is None:
                     if (
-                            self.board[7][1] is None
-                            and self.board[7][2] is None
-                            and self.board[7][3] is None
+                        self.board[7][1] is None
+                        and self.board[7][2] is None
+                        and self.board[7][3] is None
                     ):
                         moves.append(Position(x=2, y=7))
         else:
@@ -332,9 +329,9 @@ class Map:
             if self.board[0][0] is not None:
                 if self.board[0][0].last_move is None:
                     if (
-                            self.board[0][1] is None
-                            and self.board[0][2] is None
-                            and self.board[0][3] is None
+                        self.board[0][1] is None
+                        and self.board[0][2] is None
+                        and self.board[0][3] is None
                     ):
                         moves.append(Position(x=2, y=0))
 
