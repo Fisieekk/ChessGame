@@ -151,12 +151,12 @@ class GameController:
         text = font.render(message, True, self.config.COLORS["WHITE"])
         if lose:
             symbol = pygame.transform.scale(
-                pygame.image.load("utils/images/cross.png"),
+                pygame.image.load("game_files/utils/images/cross.png"),
                 (self.config.SQUARE_SIZE, self.config.SQUARE_SIZE),
             )
         else:
             symbol = pygame.transform.scale(
-                pygame.image.load("utils/images/crown.png"),
+                pygame.image.load("game_files/utils/images/crown.png"),
                 (self.config.SQUARE_SIZE, self.config.SQUARE_SIZE),
             )
         symbol_rect = symbol.get_rect(
