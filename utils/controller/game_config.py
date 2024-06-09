@@ -30,7 +30,7 @@ class GameConfig:
         "BLACK_MOVE_BACKGROUND": (90, 90, 90),
     }
     LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"]
-    FPS = 30
+    FPS = 120
     IMAGES = {}
     UTILS_RECTANGLE = (X_OFFSET + BOARD_SIZE + 100, Y_OFFSET, 400, 520)
     (
@@ -48,23 +48,6 @@ class GameConfig:
     BORDER_RADIUS = 10
     FONT = pygame.font.Font(None, 32)
     EVAL_FONT = pygame.font.Font(None, 24)
-
-    STOCKFISH_PARAMETERS = {
-        "Debug Log File": "",
-        "Contempt": 0,
-        "Min Split Depth": 0,
-        "Threads": 8,
-        "Ponder": "false",
-        "Hash": 4096,
-        "MultiPV": 1,
-        "Skill Level": 1,
-        "Move Overhead": 10,
-        "Minimum Thinking Time": 10,
-        "Slow Mover": 100,
-        "UCI_Chess960": "false",
-        "UCI_LimitStrength": "true",
-        "UCI_Elo": 1500,
-    }
 
     def load_images(self) -> None:
         """

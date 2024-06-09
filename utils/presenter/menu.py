@@ -17,6 +17,7 @@ class Menu:
         self.choosing_color = False
         self.chosen_color = None
         self.config_complete = False
+        self.chosen_elo = None
 
     def draw_menu_background(self) -> None:
         """
@@ -42,9 +43,7 @@ class Menu:
         :return: None
         """
         button_config = (
-            self.config.COLOR_CHOICE_BUTTONS
-            if self.choosing_color
-            else self.config.GAME_TYPE_BUTTONS
+           self.config.GAME_TYPE_BUTTONS if not self.game_type else (self.config.COLOR_CHOICE_BUTTONS if not self.chosen_color else self.config.ELO_BUTTONS)
         )
 
         for text, (x, y, width, height) in button_config.items():
@@ -70,7 +69,7 @@ class Menu:
         self.draw_menu_background()
         self.draw_buttons()
 
-    def handle_enemy_chose_menu(self, x: int, y: int) -> None:
+    def handle_user_input(self, x: int, y: int) -> None:
         """
         Handle the user input for the menu
         :param x: x coordinate of the mouse click
@@ -82,18 +81,19 @@ class Menu:
                 if action == "Play with computer":
                     self.game_type = "computer"
                     self.choosing_color = True
-                    self.buttons.clear()
-                elif action in ["Play as white", "Play as black"]:
-                    self.chosen_color = action.split()[-1]  # Store chosen color
-                    self.config_complete = True
                 elif action == "Back":
                     self.choosing_color = False
-                    self.buttons.clear()
-                else:
-                    self.game_type = action.split()[
-                        -1
-                    ]  # Get the last word of the button text(onboard/quit)
+                    self.game_type = None
+                elif action in ["Play as white", "Play as black"]:
+                    self.chosen_color = action.split()[-1]
+                elif action in self.config.ELO_BUTTONS.keys():
+                    self.chosen_elo = int(action.split()[-1])
+                    # print(f"Chosen elo: {self.chosen_elo}")
                     self.config_complete = True
+                else:
+                    self.game_type = action.split()[-1]
+                    self.config_complete = True
+                self.buttons.clear()
                 print(f"Game type: {self.game_type}")
 
     def update_screen(self) -> None:
@@ -105,10 +105,10 @@ class Menu:
         self.draw_enemy_chose_menu()
         pygame.display.flip()
 
-    def main(self) -> Optional[str]:
+    def main(self) -> tuple[Optional[str], Optional[int]]:
         """
         Main loop for the menu
-        :return:
+        :return: tuple containing the game type and the chosen elo
         """
         pygame.display.set_caption("Menu")
         while not self.config_complete:
@@ -117,6 +117,6 @@ class Menu:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.handle_enemy_chose_menu(*event.pos)
+                    self.handle_user_input(*event.pos)
             self.update_screen()
-        return self.game_type
+        return self.game_type, self.chosen_elo

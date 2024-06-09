@@ -358,7 +358,8 @@ class GameController:
         """
         self.draw_new_game_button()
         self.draw_utils_rect()
-        self.draw_evaluation_diff(evaluation)
+        # we need to turn off showing the evaluation because of sooo big lag on elo ratings other than default
+        # self.draw_evaluation_diff(evaluation)
         self.draw_history()
 
     def update_screen(self, evaluation: float) -> None:

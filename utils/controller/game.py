@@ -33,7 +33,7 @@ class Game:
             r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
         )
         self.engine = Stockfish(
-            path=self.stockfish_path, parameters=self.config.STOCKFISH_PARAMETERS
+            path=self.stockfish_path
         )
         self.game_type = None
         self.player_color = "white"
@@ -233,13 +233,16 @@ class Game:
         """
         pygame.init()
         pygame.font.init()
-        self.game_type = self.menu.main()
+        self.game_type, elo = self.menu.main()
         if self.game_type == "Quit":
             pygame.quit()
             return
         elif self.game_type == "computer":
             self.player_color = self.menu.chosen_color
             self.engine_color = "black" if self.player_color == "white" else "white"
+            self.engine.set_skill_level(1)
+            self.engine.set_elo_rating(elo)
+
         timer = pygame.time.Clock()
         pygame.display.set_caption("Chess App")
         self.engine.set_position([])
@@ -248,16 +251,19 @@ class Game:
         while self.running:
             timer.tick(self.config.FPS)
 
-            if self.fps_counter % 15 == 0:  # every 15 frames to not kill the CPU
-                evaluation = self.engine.get_evaluation()
+
+            # if self.fps_counter % 15 == 0:  # every 15 frames to not kill the CPU
+            #     evaluation = self.engine.get_evaluation()
             self.controller.update_screen(evaluation["value"])
             self.fps_counter += 1
 
             if (
                 self.game_type == "computer"
-                and self.map.curr_player == self.engine_color
+                and self.map.curr_player == self.engine_color and not self.mate and not self.stalemate
             ):
+                pygame.display.flip() # might seem redundant but prevents user move lag
                 result = self.engine.get_best_move()
+                sleep(0.2)
                 self.map.make_engine_move(result, self.player_color, self.engine_color)
                 self.engine.make_moves_from_current_position([result])
                 self.map.check(self.map.curr_player)
