@@ -43,7 +43,13 @@ class Menu:
         :return: None
         """
         button_config = (
-           self.config.GAME_TYPE_BUTTONS if not self.game_type else (self.config.COLOR_CHOICE_BUTTONS if not self.chosen_color else self.config.ELO_BUTTONS)
+            self.config.GAME_TYPE_BUTTONS
+            if not self.game_type
+            else (
+                self.config.COLOR_CHOICE_BUTTONS
+                if not self.chosen_color
+                else self.config.ELO_BUTTONS
+            )
         )
 
         for text, (x, y, width, height) in button_config.items():

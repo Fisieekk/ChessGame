@@ -70,6 +70,6 @@ class GameConfig:
         ]
         for piece in pieces:
             self.IMAGES[piece] = pygame.transform.scale(
-                pygame.image.load("utils/images/" + piece + ".png"),
+                pygame.image.load("game_files/utils/images/" + piece + ".png"),
                 (self.SQUARE_SIZE, self.SQUARE_SIZE),
             )

@@ -30,11 +30,9 @@ class Game:
         self.promoting_pieces = None
         self.config.load_images()
         self.stockfish_path = (
-            r".\.\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
+            r"game_files\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
         )
-        self.engine = Stockfish(
-            path=self.stockfish_path
-        )
+        self.engine = Stockfish(path=self.stockfish_path)
         self.game_type = None
         self.player_color = "white"
         self.engine_color = "black"
@@ -251,7 +249,6 @@ class Game:
         while self.running:
             timer.tick(self.config.FPS)
 
-
             # if self.fps_counter % 15 == 0:  # every 15 frames to not kill the CPU
             #     evaluation = self.engine.get_evaluation()
             self.controller.update_screen(evaluation["value"])
@@ -259,9 +256,11 @@ class Game:
 
             if (
                 self.game_type == "computer"
-                and self.map.curr_player == self.engine_color and not self.mate and not self.stalemate
+                and self.map.curr_player == self.engine_color
+                and not self.mate
+                and not self.stalemate
             ):
-                pygame.display.flip() # might seem redundant but prevents user move lag
+                pygame.display.flip()  # might seem redundant but prevents user move lag
                 result = self.engine.get_best_move()
                 sleep(0.2)
                 self.map.make_engine_move(result, self.player_color, self.engine_color)
