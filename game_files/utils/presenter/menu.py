@@ -1,8 +1,7 @@
-from typing import Optional
 import pygame
 import sys
-from chess_engine import Position
-from utils.presenter.menu_config import MenuConfig
+from typing import Optional
+from game_files.utils.presenter.menu_config import MenuConfig
 
 
 class Menu:

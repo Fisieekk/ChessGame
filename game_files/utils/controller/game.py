@@ -1,12 +1,18 @@
-from time import sleep
+import os
+from typing import List, Dict
 
 import pygame
-from chess import engine
-from chess_engine import *
-from .game_config import GameConfig
-from .game_controller import GameController
+import json
+from datetime import datetime
+from time import sleep
 from stockfish import Stockfish
-from ..presenter.menu import Menu
+from game_files.chess_engine.map import Map
+from game_files.chess_engine.pieces.king import King
+from game_files.chess_engine.pieces.pawn import Pawn
+from game_files.chess_engine.position import Position
+from game_files.utils.controller.game_config import GameConfig
+from game_files.utils.controller.game_controller import GameController
+from game_files.utils.presenter.menu import Menu
 
 
 class Game:
@@ -23,7 +29,6 @@ class Game:
         self.selected_piece = None
         self.original_pos = None
         self.mouse_down = False
-        self.config.LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"]
         self.fps_counter = 0
         self.mate = False
         self.stalemate = False
@@ -33,13 +38,18 @@ class Game:
             r"game_files\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
         )
         self.engine = Stockfish(path=self.stockfish_path)
+        self.eval_engine = Stockfish(path=self.stockfish_path)
         self.game_type = None
+        self.elo = None
         self.player_color = "white"
         self.engine_color = "black"
+        self.game_time_start = None
+        self.game_time_stop = None
+        self.game_saved = False
 
     def reinitialize(self) -> None:
         """
-        Reinitialize the game after clicking the reset button
+        Reinitialize the game state
         :return: None
         """
         self.map = Map(8, 8)
@@ -82,15 +92,15 @@ class Game:
         :return: None
         """
         if (
-            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             row, col = (x - self.config.X_OFFSET) // self.config.SQUARE_SIZE, (
-                y - self.config.Y_OFFSET
+                    y - self.config.Y_OFFSET
             ) // self.config.SQUARE_SIZE
             if (
-                self.map.board[col][row]
-                and self.map.board[col][row].color == self.map.curr_player
+                    self.map.board[col][row]
+                    and self.map.board[col][row].color == self.map.curr_player
             ):
                 self.selected_piece = self.map.board[col][row]
                 self.original_pos = Position(x=row, y=col)
@@ -120,13 +130,13 @@ class Game:
         :return: True if it is an en passant move, False otherwise
         """
         return (
-            self.map.last_move
-            and abs(self.map.last_move[1].y - self.map.last_move[0].y) == 2
-            and type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
-            and new_position in self.attack_moves
-            and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
-            and self.map.board[self.original_pos.y][new_position.x].color
-            != self.map.curr_player
+                self.map.last_move
+                and abs(self.map.last_move[1].y - self.map.last_move[0].y) == 2
+                and type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
+                and new_position in self.attack_moves
+                and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
+                and self.map.board[self.original_pos.y][new_position.x].color
+                != self.map.curr_player
         )
 
     def en_passant_move(self, new_position: Position) -> None:
@@ -169,8 +179,8 @@ class Game:
         :return: None
         """
         if (
-            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             new_position = Position(
                 x=((x - self.config.X_OFFSET) // self.config.SQUARE_SIZE),
@@ -178,8 +188,8 @@ class Game:
             )
             if new_position in self.moves or new_position in self.attack_moves:
                 if (
-                    self.original_pos.x != new_position.x
-                    or self.original_pos.y != new_position.y
+                        self.original_pos.x != new_position.x
+                        or self.original_pos.y != new_position.y
                 ):
                     if self.en_passant_verification(new_position):
                         self.en_passant_move(new_position)
@@ -205,6 +215,7 @@ class Game:
                 if not self.map.promoting_piece:
                     last_move = self.map.history[-1]
                     self.engine.make_moves_from_current_position([last_move])
+                    self.eval_engine.make_moves_from_current_position([last_move])
 
         self.map.check(self.map.curr_player)
         self.mate = self.map.calculate_mate()
@@ -213,73 +224,151 @@ class Game:
         self.moves, self.attack_moves = None, None
         self.mouse_down = False
 
-    def new_game_button_clicked(self, x, y) -> None:
+    def new_game_button_clicked(self, x, y) -> int:
         """
-        Reset the game if the reset button is clicked
+        Check if we clicked the new game button
         :param x: x coordinate of the mouse
         :param y: y coordinate of the mouse
-        :return: None
+        :return: 1 if we clicked new game, 0 elsewhere
         """
         button_rect = pygame.Rect(self.config.RESET_BUTTON)
         if button_rect.collidepoint(x, y):
-            self.reinitialize()
+            return 1
+        return 0
 
-    def main(self) -> None:
+    def handle_menu(self) -> int:
         """
-        Main function to run the game and handle the events
-        :return: None
+        Method to show and handle a menu.
+        :return: 1 if we choose to quit, 0 elsewhere
         """
-        pygame.init()
-        pygame.font.init()
-        self.game_type, elo = self.menu.main()
+        self.game_type, self.elo = self.menu.main()
         if self.game_type == "Quit":
-            pygame.quit()
-            return
+            return 1
         elif self.game_type == "computer":
             self.player_color = self.menu.chosen_color
             self.engine_color = "black" if self.player_color == "white" else "white"
             self.engine.set_skill_level(1)
-            self.engine.set_elo_rating(elo)
+            self.engine.set_elo_rating(self.elo)
+
+        return 0
+
+    def read_json(self) -> List[Dict]:
+        """
+        Read a json file which contains a list of past games, create it if it does not exist
+        :return: list with the json content
+        """
+        if not os.path.exists(self.config.JSON_PATH):
+            with open(self.config.JSON_PATH, "w") as file:
+                json.dump([], file)
+
+        with open(self.config.JSON_PATH, "r") as file:
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError:
+                data = []
+
+        return data
+
+    def write_json(self, data: List[Dict]) -> None:
+        """
+        Write a list of past games to a json file
+        :param data: list of past games
+        :return: None
+        """
+        with open(self.config.JSON_PATH, "w") as file:
+            json.dump(data, file)
+
+    def create_result(self, result: str) -> Dict:
+        """
+        Create a dictionary with the result of the game
+        :param result: result of the game
+        :return: dictionary with the result of the game
+        """
+        return {
+            "result": result,
+            "winner": ("white" if self.map.curr_player == "black" else "black") if result == "mate" else None,
+            "game_type": "player vs computer" if self.game_type == "computer" else "player vs player",
+            "history": self.map.history,
+            "player_color": self.player_color if self.game_type == "computer" else None,
+            "engine elo": self.elo if self.game_type == "computer" else None,
+            "time started": self.game_time_start,
+            "time ended": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+    def save_game(self, result: str) -> None:
+        """
+        Save the current game to the json file in format as below:
+        {
+            "result": result of the game,
+            "winner": winner of the game,
+            "game_type": type of the game,
+            "history": list of moves,
+            "player_color": color of the player(null in PvP),
+            "engine elo": elo of the engine(null in PvP),
+            "time started": time the game started,
+            "time ended": time the game ended
+        }
+        :param result: result of the game
+        :return: None
+        """
+        if self.game_saved:
+            return
+        data = self.read_json()
+        data.append(self.create_result(result))
+        self.write_json(data)
+        self.game_saved = True
+
+    def main(self) -> int:
+        """
+        Main function to run the game and handle the events
+        :return: 1 if we choose to quit, 0 elsewhere        """
+        pygame.init()
+        pygame.font.init()
+        if self.handle_menu():
+            pygame.quit()
+            return 1
 
         timer = pygame.time.Clock()
         pygame.display.set_caption("Chess App")
         self.engine.set_position([])
-        evaluation = self.engine.get_evaluation()
+        self.eval_engine.set_position([])
+        evaluation = self.eval_engine.get_evaluation()
 
+        self.game_time_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         while self.running:
             timer.tick(self.config.FPS)
-
-            # if self.fps_counter % 15 == 0:  # every 15 frames to not kill the CPU
-            #     evaluation = self.engine.get_evaluation()
             self.controller.update_screen(evaluation["value"])
             self.fps_counter += 1
 
             if (
-                self.game_type == "computer"
-                and self.map.curr_player == self.engine_color
-                and not self.mate
-                and not self.stalemate
+                    self.game_type == "computer"
+                    and self.map.curr_player == self.engine_color
+                    and not self.mate
+                    and not self.stalemate
             ):
                 pygame.display.flip()  # might seem redundant but prevents user move lag
                 result = self.engine.get_best_move()
                 sleep(0.2)
                 self.map.make_engine_move(result, self.player_color, self.engine_color)
                 self.engine.make_moves_from_current_position([result])
+                self.eval_engine.make_moves_from_current_position([result])
                 self.map.check(self.map.curr_player)
                 self.mate = self.map.calculate_mate()
                 self.stalemate = self.map.calculate_stalemate()
+                evaluation = self.eval_engine.get_evaluation()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
 
                 if (
-                    self.map.curr_player == self.player_color
-                    or self.game_type == "onboard"
+                        self.map.curr_player == self.player_color
+                        or self.game_type == "onboard"
                 ):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         x, y = pygame.mouse.get_pos()
-                        self.new_game_button_clicked(x, y)
+                        if self.new_game_button_clicked(x, y):
+                            return 0
 
                     if not self.mate and not self.stalemate:
                         if not self.map.promoting_piece:
@@ -289,11 +378,12 @@ class Game:
                                 self.update_possible_moves()
 
                             if (
-                                event.type == pygame.MOUSEBUTTONUP
-                                and self.selected_piece
+                                    event.type == pygame.MOUSEBUTTONUP
+                                    and self.selected_piece
                             ):
                                 x, y = pygame.mouse.get_pos()
                                 self.choose_type_of_move(x, y)
+                                evaluation = self.eval_engine.get_evaluation()
 
             if self.map.promoting_piece:
                 promoting_piece_position = self.map.promoting_piece.position
@@ -309,6 +399,7 @@ class Game:
                         self.map.check(self.map.curr_player)
                         self.mate = self.map.calculate_mate()
                         self.stalemate = self.map.calculate_stalemate()
+                        evaluation = self.eval_engine.get_evaluation()
             if self.mate:
                 self.controller.draw_message(
                     "white" if self.map.curr_player == "black" else "black",
@@ -316,9 +407,11 @@ class Game:
                     self.game_type,
                     self.player_color,
                 )
+                self.save_game("mate")
 
             elif self.stalemate:
                 self.controller.draw_message(None, "Stalemate", None, None)
+                self.save_game("stalemate")
 
                 # dragging piece
             if self.mouse_down and self.selected_piece:
@@ -337,3 +430,5 @@ class Game:
             pygame.display.flip()
 
         pygame.quit()
+
+        return 0

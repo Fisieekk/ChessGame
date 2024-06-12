@@ -1,8 +1,12 @@
 from typing import Optional
-
-from .piece import Piece
-from .position import Position
-from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
+from game_files.chess_engine.piece import Piece
+from game_files.chess_engine.pieces.bishop import Bishop
+from game_files.chess_engine.pieces.king import King
+from game_files.chess_engine.pieces.knight import Knight
+from game_files.chess_engine.pieces.pawn import Pawn
+from game_files.chess_engine.pieces.queen import Queen
+from game_files.chess_engine.pieces.rook import Rook
+from game_files.chess_engine.position import Position
 
 
 class Map:

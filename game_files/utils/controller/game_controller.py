@@ -1,7 +1,9 @@
-from typing import Any, Optional, List
 import pygame
-from chess_engine import Map, Position, Piece
-from utils.controller.game_config import GameConfig
+from typing import Any, Optional
+from game_files.chess_engine.map import Map
+from game_files.chess_engine.piece import Piece
+from game_files.chess_engine.position import Position
+from game_files.utils.controller.game_config import GameConfig
 
 
 class GameController:
@@ -358,8 +360,7 @@ class GameController:
         """
         self.draw_new_game_button()
         self.draw_utils_rect()
-        # we need to turn off showing the evaluation because of sooo big lag on elo ratings other than default
-        # self.draw_evaluation_diff(evaluation)
+        self.draw_evaluation_diff(evaluation)
         self.draw_history()
 
     def update_screen(self, evaluation: float) -> None:

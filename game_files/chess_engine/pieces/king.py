@@ -1,5 +1,6 @@
-from chess_engine.piece import Piece, Position
-from .rook import Rook
+from game_files.chess_engine.piece import Piece
+from game_files.chess_engine.pieces.rook import Rook
+from game_files.chess_engine.position import Position
 
 
 class King(Piece):

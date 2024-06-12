@@ -43,7 +43,7 @@ class MenuConfig:
         }
 
         self.ELO_BUTTONS = {
-            "Stockfish ELO 100": (self.X_OFFSET + 150, self.Y_OFFSET + 50, 500, 100),
+            "Stockfish ELO 600": (self.X_OFFSET + 150, self.Y_OFFSET + 50, 500, 100),
             "Stockfish ELO 900": (self.X_OFFSET + 150, self.Y_OFFSET + 200, 500, 100),
             "Stockfish ELO 1200": (self.X_OFFSET + 150, self.Y_OFFSET + 350, 500, 100),
         }

@@ -48,6 +48,7 @@ class GameConfig:
     BORDER_RADIUS = 10
     FONT = pygame.font.Font(None, 32)
     EVAL_FONT = pygame.font.Font(None, 24)
+    JSON_PATH = "game_files/utils/past_games.json"
 
     def load_images(self) -> None:
         """
