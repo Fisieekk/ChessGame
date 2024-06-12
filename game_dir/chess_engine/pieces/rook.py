@@ -1,11 +1,11 @@
-from game_files.chess_engine.piece import Piece
+from game_dir.chess_engine.piece import Piece
 
 
-class Bishop(Piece):
+class Rook(Piece):
     def __init__(self, y: int, x: int, color: str):
         super().__init__(y, x, color)
-        self.type = "Bishop"
-        self.photo = "images/wB.png" if color == "white" else "images/bB.png"
+        self.type = "Rook"
+        self.photo = "images/wR.png" if color == "white" else "images/bR.png"
 
     def can_move(self, map) -> tuple:
         """
@@ -13,16 +13,16 @@ class Bishop(Piece):
         :param map: map of the game
         :return: tuple with the possible moves and the possible attacks
         """
-        return self.bishop_moves(map)
+        return self.rook_moves(map)
 
-    def bishop_moves(self, map) -> tuple:
+    def rook_moves(self, board) -> tuple:
         """
-        Method to get the possible moves of the bishop.
-        :param map: map of the game
+        Method to get the possible moves of the rook
+        :param board: board of the game
         :return: tuple with the possible moves and the possible attacks
         """
-        output = ((-1, -1), (1, 1), (1, -1), (-1, 1))
-        return self.create_moves(map, output)
+        output = ((-1, 0), (1, 0), (0, -1), (0, 1))
+        return self.create_moves(board, output)
 
     def get_identificator(self) -> str:
         """
@@ -31,4 +31,4 @@ class Bishop(Piece):
         It is used to identify the photo of the piece.
         :return: identificator of the piece
         """
-        return self.color[0] + "B"
+        return self.color[0] + "R"

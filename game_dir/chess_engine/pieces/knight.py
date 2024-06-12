@@ -1,5 +1,5 @@
-from game_files.chess_engine.piece import Piece
-from game_files.chess_engine.position import Position
+from game_dir.chess_engine.piece import Piece
+from game_dir.chess_engine.position import Position
 
 
 class Knight(Piece):

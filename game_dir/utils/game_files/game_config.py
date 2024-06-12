@@ -48,7 +48,7 @@ class GameConfig:
     BORDER_RADIUS = 10
     FONT = pygame.font.Font(None, 32)
     EVAL_FONT = pygame.font.Font(None, 24)
-    JSON_PATH = "game_files/utils/past_games.json"
+    JSON_PATH = "game_dir/utils/past_games.json"
 
     def load_images(self) -> None:
         """
@@ -71,6 +71,6 @@ class GameConfig:
         ]
         for piece in pieces:
             self.IMAGES[piece] = pygame.transform.scale(
-                pygame.image.load("game_files/utils/images/" + piece + ".png"),
+                pygame.image.load("game_dir/utils/images/" + piece + ".png"),
                 (self.SQUARE_SIZE, self.SQUARE_SIZE),
             )

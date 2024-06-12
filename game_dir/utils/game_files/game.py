@@ -6,13 +6,13 @@ import json
 from datetime import datetime
 from time import sleep
 from stockfish import Stockfish
-from game_files.chess_engine.map import Map
-from game_files.chess_engine.pieces.king import King
-from game_files.chess_engine.pieces.pawn import Pawn
-from game_files.chess_engine.position import Position
-from game_files.utils.controller.game_config import GameConfig
-from game_files.utils.controller.game_controller import GameController
-from game_files.utils.presenter.menu import Menu
+from game_dir.chess_engine.map import Map
+from game_dir.chess_engine.pieces.king import King
+from game_dir.chess_engine.pieces.pawn import Pawn
+from game_dir.chess_engine.position import Position
+from game_dir.utils.game_files.game_config import GameConfig
+from game_dir.utils.game_files.game_controller import GameController
+from game_dir.utils.menu_files.menu import Menu
 
 
 class Game:
@@ -35,7 +35,7 @@ class Game:
         self.promoting_pieces = None
         self.config.load_images()
         self.stockfish_path = (
-            r"game_files\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
+            r"game_dir\chess_engine\stockfish\stockfish-windows-x86-64-avx2.exe"
         )
         self.engine = Stockfish(path=self.stockfish_path)
         self.eval_engine = Stockfish(path=self.stockfish_path)

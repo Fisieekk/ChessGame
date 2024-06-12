@@ -1,9 +1,9 @@
 import pygame
 from typing import Any, Optional
-from game_files.chess_engine.map import Map
-from game_files.chess_engine.piece import Piece
-from game_files.chess_engine.position import Position
-from game_files.utils.controller.game_config import GameConfig
+from game_dir.chess_engine.map import Map
+from game_dir.chess_engine.piece import Piece
+from game_dir.chess_engine.position import Position
+from game_dir.utils.game_files.game_config import GameConfig
 
 
 class GameController:
@@ -153,12 +153,12 @@ class GameController:
         text = font.render(message, True, self.config.COLORS["WHITE"])
         if lose:
             symbol = pygame.transform.scale(
-                pygame.image.load("game_files/utils/images/cross.png"),
+                pygame.image.load("game_dir/utils/images/cross.png"),
                 (self.config.SQUARE_SIZE, self.config.SQUARE_SIZE),
             )
         else:
             symbol = pygame.transform.scale(
-                pygame.image.load("game_files/utils/images/crown.png"),
+                pygame.image.load("game_dir/utils/images/crown.png"),
                 (self.config.SQUARE_SIZE, self.config.SQUARE_SIZE),
             )
         symbol_rect = symbol.get_rect(

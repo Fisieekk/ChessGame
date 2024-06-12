@@ -1,4 +1,4 @@
-import game_files.utils.controller.game as g
+import game_dir.utils.game_files.game as g
 
 
 quit_option = 0
