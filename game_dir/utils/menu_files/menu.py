@@ -99,7 +99,7 @@ class Menu:
                     self.game_type = action.split()[-1]
                     self.config_complete = True
                 self.buttons.clear()
-                print(f"Game type: {self.game_type}")
+                # print(f"Game type: {self.game_type}")
 
     def update_screen(self) -> None:
         """

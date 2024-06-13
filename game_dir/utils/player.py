@@ -6,7 +6,6 @@ class Player:
         self.taken = []
         self.king = True
 
-    # Getter
     def get_name(self) -> str:
         """
         Get the name of the player
@@ -34,7 +33,6 @@ class Player:
     def get_king(self):
         return self.king
 
-    # Setter
     def set_own(self, own):
         self.own = own
 

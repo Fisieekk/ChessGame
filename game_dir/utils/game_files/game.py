@@ -80,7 +80,7 @@ class Game:
             if current_position.collidepoint(x, y):
                 new_position = Position(x=0, y=0)
                 new_position.from_string_to_map(self.map.history[-1][2:])
-                print("New position: ", new_position)
+                # print("New position: ", new_position)
                 self.map.change_piece(new_position, identifier)
                 return True
         return False
@@ -281,7 +281,17 @@ class Game:
 
     def create_result(self, result: str) -> Dict:
         """
-        Create a dictionary with the result of the game
+        Create a dictionary with the result of the game in format as below:
+        {
+            "result": result of the game,
+            "winner": winner of the game,
+            "game_type": type of the game,
+            "history": list of moves,
+            "player_color": color of the player(null in PvP),
+            "engine_elo": elo of the engine(null in PvP),
+            "time_started": time the game started,
+            "time_ended": time the game ended
+        }
         :param result: result of the game
         :return: dictionary with the result of the game
         """
@@ -298,17 +308,7 @@ class Game:
 
     def save_game(self, result: str) -> None:
         """
-        Save the current game to the json file in format as below:
-        {
-            "result": result of the game,
-            "winner": winner of the game,
-            "game_type": type of the game,
-            "history": list of moves,
-            "player_color": color of the player(null in PvP),
-            "engine elo": elo of the engine(null in PvP),
-            "time started": time the game started,
-            "time ended": time the game ended
-        }
+        Save the current game to the json file
         :param result: result of the game
         :return: None
         """
@@ -318,12 +318,13 @@ class Game:
         data.append(self.create_result(result))
         self.write_json(data)
         self.game_saved = True
-        upload_new(data) # uncomment this line to upload the game to the database
+        #upload_new(data) # uncomment this line to upload the game to the database
 
     def main(self) -> int:
         """
         Main function to run the game and handle the events
-        :return: 1 if we choose to quit, 0 elsewhere        """
+        :return: 1 if we choose to quit, 0 elsewhere
+        """
         pygame.init()
         pygame.font.init()
         if self.handle_menu():
@@ -346,7 +347,7 @@ class Game:
                     self.game_type == "computer"
                     and self.map.curr_player == self.engine_color
                     and not self.mate
-                    and not self.stalemate
+                    and not self.stalemate and not self.map.promoting_piece
             ):
                 pygame.display.flip()  # might seem redundant but prevents user move lag
                 result = self.engine.get_best_move()
@@ -397,6 +398,7 @@ class Game:
                     if self.handle_promotion(x, y):
                         last_move = self.map.history[-1]
                         self.engine.make_moves_from_current_position([last_move])
+                        self.eval_engine.make_moves_from_current_position([last_move])
                         self.map.promoting_piece = None
                         self.map.check(self.map.curr_player)
                         self.mate = self.map.calculate_mate()
@@ -426,8 +428,8 @@ class Game:
             if self.map.check_white or self.map.check_black:
                 self.controller.draw_checks()
 
-            if self.fps_counter % 100 == 0:
-                print(self.map.history)
+            # if self.fps_counter % 100 == 0:
+            #     print(self.map.history)
 
             pygame.display.flip()
 
