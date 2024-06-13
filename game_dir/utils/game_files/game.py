@@ -93,15 +93,15 @@ class Game:
         :return: None
         """
         if (
-                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             row, col = (x - self.config.X_OFFSET) // self.config.SQUARE_SIZE, (
-                    y - self.config.Y_OFFSET
+                y - self.config.Y_OFFSET
             ) // self.config.SQUARE_SIZE
             if (
-                    self.map.board[col][row]
-                    and self.map.board[col][row].color == self.map.curr_player
+                self.map.board[col][row]
+                and self.map.board[col][row].color == self.map.curr_player
             ):
                 self.selected_piece = self.map.board[col][row]
                 self.original_pos = Position(x=row, y=col)
@@ -131,13 +131,13 @@ class Game:
         :return: True if it is an en passant move, False otherwise
         """
         return (
-                self.map.last_move
-                and abs(self.map.last_move[1].y - self.map.last_move[0].y) == 2
-                and type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
-                and new_position in self.attack_moves
-                and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
-                and self.map.board[self.original_pos.y][new_position.x].color
-                != self.map.curr_player
+            self.map.last_move
+            and abs(self.map.last_move[1].y - self.map.last_move[0].y) == 2
+            and type(self.map.board[self.original_pos.y][self.original_pos.x]) is Pawn
+            and new_position in self.attack_moves
+            and type(self.map.board[self.original_pos.y][new_position.x]) is Pawn
+            and self.map.board[self.original_pos.y][new_position.x].color
+            != self.map.curr_player
         )
 
     def en_passant_move(self, new_position: Position) -> None:
@@ -180,8 +180,8 @@ class Game:
         :return: None
         """
         if (
-                0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
-                and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
+            0 < x - self.config.X_OFFSET < self.config.BOARD_SIZE
+            and 0 < y - self.config.Y_OFFSET < self.config.BOARD_SIZE
         ):
             new_position = Position(
                 x=((x - self.config.X_OFFSET) // self.config.SQUARE_SIZE),
@@ -189,8 +189,8 @@ class Game:
             )
             if new_position in self.moves or new_position in self.attack_moves:
                 if (
-                        self.original_pos.x != new_position.x
-                        or self.original_pos.y != new_position.y
+                    self.original_pos.x != new_position.x
+                    or self.original_pos.y != new_position.y
                 ):
                     if self.en_passant_verification(new_position):
                         self.en_passant_move(new_position)
@@ -297,8 +297,16 @@ class Game:
         """
         return {
             "result": result,
-            "winner": ("white" if self.map.curr_player == "black" else "black") if result == "mate" else None,
-            "game_type": "player vs computer" if self.game_type == "computer" else "player vs player",
+            "winner": (
+                ("white" if self.map.curr_player == "black" else "black")
+                if result == "mate"
+                else None
+            ),
+            "game_type": (
+                "player vs computer"
+                if self.game_type == "computer"
+                else "player vs player"
+            ),
             "history": self.map.history,
             "player_color": self.player_color if self.game_type == "computer" else None,
             "engine elo": self.elo if self.game_type == "computer" else None,
@@ -318,7 +326,7 @@ class Game:
         data.append(self.create_result(result))
         self.write_json(data)
         self.game_saved = True
-        #upload_new(data) # uncomment this line to upload the game to the database
+        upload_new(data)  # uncomment this line to upload the game to the database
 
     def main(self) -> int:
         """
@@ -344,10 +352,11 @@ class Game:
             self.fps_counter += 1
 
             if (
-                    self.game_type == "computer"
-                    and self.map.curr_player == self.engine_color
-                    and not self.mate
-                    and not self.stalemate and not self.map.promoting_piece
+                self.game_type == "computer"
+                and self.map.curr_player == self.engine_color
+                and not self.mate
+                and not self.stalemate
+                and not self.map.promoting_piece
             ):
                 pygame.display.flip()  # might seem redundant but prevents user move lag
                 result = self.engine.get_best_move()
@@ -365,8 +374,8 @@ class Game:
                     self.running = False
 
                 if (
-                        self.map.curr_player == self.player_color
-                        or self.game_type == "onboard"
+                    self.map.curr_player == self.player_color
+                    or self.game_type == "onboard"
                 ):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         x, y = pygame.mouse.get_pos()
@@ -381,8 +390,8 @@ class Game:
                                 self.update_possible_moves()
 
                             if (
-                                    event.type == pygame.MOUSEBUTTONUP
-                                    and self.selected_piece
+                                event.type == pygame.MOUSEBUTTONUP
+                                and self.selected_piece
                             ):
                                 x, y = pygame.mouse.get_pos()
                                 self.choose_type_of_move(x, y)

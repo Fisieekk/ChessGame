@@ -5,50 +5,56 @@ from typing import List, Dict
 
 
 client = MongoClient("mongodb://localhost:27017/")
-db = client['games']
+db = client["games"]
 
 
 schema = {
     "bsonType": "object",
-    "required": ["result", "winner", "game_type", "history", "time started", "time ended"],
+    "required": [
+        "result",
+        "winner",
+        "game_type",
+        "history",
+        "time started",
+        "time ended",
+    ],
     "properties": {
         "result": {
             "bsonType": "string",
-            "description": "must be a string and is required"
+            "description": "must be a string and is required",
         },
         "winner": {
             "bsonType": "string",
-            "description": "must be a string and is required"
+            "description": "must be a string and is required",
         },
         "game_type": {
             "bsonType": "string",
-            "description": "must be a string and is required"
+            "description": "must be a string and is required",
         },
         "history": {
             "bsonType": "array",
-            "items": {
-                "bsonType": "string"
-            },
-            "description": "must be an array of strings and is required"
+            "items": {"bsonType": "string"},
+            "description": "must be an array of strings and is required",
         },
         "player_color": {
             "bsonType": ["string", "null"],
-            "description": "can be a string or null"
+            "description": "can be a string or null",
         },
         "engine elo": {
             "bsonType": ["int", "null"],
-            "description": "can be an integer or null"
+            "description": "can be an integer or null",
         },
         "time started": {
             "bsonType": "date",
-            "description": "must be a date and is required"
+            "description": "must be a date and is required",
         },
         "time ended": {
             "bsonType": "date",
-            "description": "must be a date and is required"
-        }
-    }
+            "description": "must be a date and is required",
+        },
+    },
 }
+
 
 def collection_remover(collection: str) -> None:
     """
@@ -62,6 +68,7 @@ def collection_remover(collection: str) -> None:
     except Exception as e:
         print(e)
 
+
 def create_collection_with_schema(collection: str, schema: Dict) -> None:
     """
     Create a new collection with the specified schema.
@@ -71,9 +78,10 @@ def create_collection_with_schema(collection: str, schema: Dict) -> None:
     :return: None
     """
     try:
-        db.create_collection(collection, validator={'$jsonSchema': schema})
+        db.create_collection(collection, validator={"$jsonSchema": schema})
     except Exception as e:
         print(e)
+
 
 def base_cleaner(collection_name: str) -> None:
     """
@@ -88,7 +96,8 @@ def base_cleaner(collection_name: str) -> None:
     except Exception as e:
         print(e)
 
-def upload_existing(path: str, collection_name:str) -> None:
+
+def upload_existing(path: str, collection_name: str) -> None:
     """
     Upload existing game data from a JSON file to the specified collection.
 
@@ -98,7 +107,7 @@ def upload_existing(path: str, collection_name:str) -> None:
     """
     try:
         collection = db[collection_name]
-        with open(path, 'r') as file:
+        with open(path, "r") as file:
             print("Reading file...")
             file_content = file.read()
             if not file_content.strip():
@@ -107,12 +116,17 @@ def upload_existing(path: str, collection_name:str) -> None:
             data = json.loads(file_content)
             print("Loaded JSON data:", data)
         for game in data:
-            game["time started"] = datetime.strptime(game["time started"], "%Y-%m-%d %H:%M:%S")
-            game["time ended"] = datetime.strptime(game["time ended"], "%Y-%m-%d %H:%M:%S")
+            game["time started"] = datetime.strptime(
+                game["time started"], "%Y-%m-%d %H:%M:%S"
+            )
+            game["time ended"] = datetime.strptime(
+                game["time ended"], "%Y-%m-%d %H:%M:%S"
+            )
             collection.insert_one(game)
         print("Data uploaded successfully.")
     except Exception as e:
         print("Error:", e)
+
 
 def main() -> None:
     """
@@ -122,16 +136,18 @@ def main() -> None:
     """
     try:
         path = "game_dir/utils/past_games.json"
-        collection_remover('games')
-        create_collection_with_schema('games', schema)
-        collection_name = 'games'
+        collection_remover("games")
+        create_collection_with_schema("games", schema)
+        collection_name = "games"
         base_cleaner(collection_name)
         upload_existing(path, collection_name)
     except Exception as e:
         print(e)
 
+
 if __name__ == "__main__":
     main()
+
 
 def upload_new(data: List[Dict]) -> None:
     """
@@ -141,16 +157,17 @@ def upload_new(data: List[Dict]) -> None:
     :return: None
     """
     try:
-        collection = db['games']
+        collection = db["games"]
         print("DATA:", data)
         game = data[-1]
         print("GAME:", game)
-        game["time started"] = datetime.strptime(game["time started"], "%Y-%m-%d %H:%M:%S")
+        game["time started"] = datetime.strptime(
+            game["time started"], "%Y-%m-%d %H:%M:%S"
+        )
         game["time ended"] = datetime.strptime(game["time ended"], "%Y-%m-%d %H:%M:%S")
         collection.insert_one(game)
-        #print every game in the collection
+        # print every game in the collection
         for game in collection.find():
-            print("COLGAME\n",game)
+            print("COLGAME\n", game)
     except Exception as e:
         print(e)
-

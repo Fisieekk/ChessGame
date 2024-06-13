@@ -1,6 +1,6 @@
 from typing import Optional
 from .piece import Piece
-from .pieces import Bishop,King,Knight,Pawn,Queen,Rook
+from .pieces import Bishop, King, Knight, Pawn, Queen, Rook
 from .position import Position
 
 
