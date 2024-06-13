@@ -1,12 +1,7 @@
 from typing import Optional
-from game_dir.chess_engine.piece import Piece
-from game_dir.chess_engine.pieces.bishop import Bishop
-from game_dir.chess_engine.pieces.king import King
-from game_dir.chess_engine.pieces.knight import Knight
-from game_dir.chess_engine.pieces.pawn import Pawn
-from game_dir.chess_engine.pieces.queen import Queen
-from game_dir.chess_engine.pieces.rook import Rook
-from game_dir.chess_engine.position import Position
+from .piece import Piece
+from .pieces import Bishop,King,Knight,Pawn,Queen,Rook
+from .position import Position
 
 
 class Map:

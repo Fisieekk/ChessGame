@@ -1,5 +1,5 @@
-from game_dir.chess_engine.piece import Piece
-from game_dir.chess_engine.position import Position
+from chess_engine.piece import Piece
+from chess_engine.position import Position
 
 
 class Pawn(Piece):

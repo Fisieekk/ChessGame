@@ -1,7 +1,7 @@
 import pygame
 import sys
 from typing import Optional
-from game_dir.utils.menu_files.menu_config import MenuConfig
+from .menu_config import MenuConfig
 
 
 class Menu:

@@ -1,4 +1,4 @@
-from game_dir.chess_engine.piece import Piece
+from chess_engine.piece import Piece
 
 
 class Bishop(Piece):

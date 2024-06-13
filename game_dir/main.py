@@ -1,4 +1,4 @@
-import game_dir.utils.game_files.game as g
+from utils import game as g
 
 
 quit_option = 0

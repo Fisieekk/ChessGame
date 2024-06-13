@@ -1,2 +1,2 @@
 @echo off
-python3 game_files/main.py || python game_files/main.py || py game_files/main.py
+python3 game_dir/main.py || python game_dir/main.py || py game_dir/main.py

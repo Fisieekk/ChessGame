@@ -1,9 +1,9 @@
 import pygame
 from typing import Any, Optional
-from game_dir.chess_engine.map import Map
-from game_dir.chess_engine.piece import Piece
-from game_dir.chess_engine.position import Position
-from game_dir.utils.game_files.game_config import GameConfig
+from chess_engine.map import Map
+from chess_engine.piece import Piece
+from chess_engine.position import Position
+from utils.game_files.game_config import GameConfig
 
 
 class GameController:

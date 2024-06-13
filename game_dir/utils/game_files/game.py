@@ -6,13 +6,14 @@ import json
 from datetime import datetime
 from time import sleep
 from stockfish import Stockfish
-from game_dir.chess_engine.map import Map
-from game_dir.chess_engine.pieces.king import King
-from game_dir.chess_engine.pieces.pawn import Pawn
-from game_dir.chess_engine.position import Position
-from game_dir.utils.game_files.game_config import GameConfig
-from game_dir.utils.game_files.game_controller import GameController
-from game_dir.utils.menu_files.menu import Menu
+from chess_engine.map import Map
+from chess_engine.pieces.king import King
+from chess_engine.pieces.pawn import Pawn
+from chess_engine.position import Position
+from .game_config import GameConfig
+from .game_controller import GameController
+from utils.menu_files.menu import Menu
+from utils.score_database import upload_new
 
 
 class Game:
@@ -317,6 +318,7 @@ class Game:
         data.append(self.create_result(result))
         self.write_json(data)
         self.game_saved = True
+        upload_new(data) # uncomment this line to upload the game to the database
 
     def main(self) -> int:
         """

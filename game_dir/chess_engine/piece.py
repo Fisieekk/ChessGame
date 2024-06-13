@@ -1,5 +1,5 @@
 import pygame
-from game_dir.chess_engine.position import Position
+from .position import Position
 
 
 class Piece:
