@@ -1,0 +1,4 @@
+pygame~=2.5.2
+pydantic~=2.7.4
+stockfish
+pymongo~=4.7.3
